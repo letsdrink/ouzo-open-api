@@ -14,7 +14,7 @@ class TypeConverter
     {
     }
 
-    public static function convertPrimitiveToSwaggerType(string $primitive): ?string
+    public static function convertPrimitiveToOpenApiType(string $primitive): ?string
     {
         return match ($primitive) {
             'int' => 'integer',

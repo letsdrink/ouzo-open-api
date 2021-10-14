@@ -38,7 +38,7 @@ class ResponseExtractor
         }
 
         if ($reflectionReturnType->isBuiltin()) {
-            $name = TypeConverter::convertPrimitiveToSwaggerType($name);
+            $name = TypeConverter::convertPrimitiveToOpenApiType($name);
             $primitiveTypeWrapper = new PrimitiveTypeWrapper($name);
             return new InternalResponse($responseCode, $primitiveTypeWrapper);
         }

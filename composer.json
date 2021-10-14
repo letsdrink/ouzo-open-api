@@ -11,12 +11,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Ouzo\\": "src"
+      "Ouzo\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Ouzo\\": "tests"
+      "Ouzo\\": "tests/"
     }
   }
 }

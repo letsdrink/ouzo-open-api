@@ -38,12 +38,12 @@ class PropertiesExtractor
 
             $type = $reflectionType->getName();
             if ($reflectionType->isBuiltin() && !in_array($type, ['array', 'object'])) {
-                $type = TypeConverter::convertPrimitiveToSwaggerType($type);
+                $type = TypeConverter::convertPrimitiveToOpenApiType($type);
                 $typeWrapper = new PrimitiveTypeWrapper($type);
             } else {
                 if ($type === 'array') {
                     $forProperty = DocCommentTypeHelper::getForProperty($reflectionProperty, 'string');
-                    $type = TypeConverter::convertPrimitiveToSwaggerType($forProperty);
+                    $type = TypeConverter::convertPrimitiveToOpenApiType($forProperty);
                     if (is_null($type)) {
                         $tmp = new ReflectionClass($forProperty);
                         $typeWrapper = new ComplexTypeWrapper($tmp);

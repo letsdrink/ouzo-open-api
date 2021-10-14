@@ -29,7 +29,7 @@ class UriParametersExtractor
         $parameters = [];
         foreach ($reflectionParameters as $reflectionParameter) {
             $reflectionType = $reflectionParameter->getType();
-            $type = TypeConverter::convertPrimitiveToSwaggerType($reflectionType);
+            $type = TypeConverter::convertPrimitiveToOpenApiType($reflectionType);
 
             if (is_null($type) && $httpMethod === HttpMethod::GET) {
                 $name = $reflectionParameter->getName();

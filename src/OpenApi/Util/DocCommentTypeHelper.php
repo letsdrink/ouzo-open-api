@@ -8,6 +8,8 @@ use phpDocumentor\Reflection\DocBlock\Tags\TagWithType;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\Array_;
+use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\String_;
 use ReflectionClass;
 use ReflectionMethod;
@@ -66,8 +68,14 @@ class DocCommentTypeHelper
         /** @var Array_ $array */
         $array = $tag->getType();
 
+        static $primitiveTypes = [
+            Boolean::class,
+            Integer::class,
+            String_::class,
+        ];
+
         $type = $array->getValueType();
-        if ($type instanceof String_) {
+        if (in_array($type::class, $primitiveTypes)) {
             return $type->__toString();
         }
 
