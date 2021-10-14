@@ -63,7 +63,7 @@ class PropertiesExtractor
             $internalProperties[] = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
         }
 
-        return $internalProperties;
+        return Arrays::uniqueBy($internalProperties, fn(InternalProperty $property) => $property->hashCode());
     }
 
     /** @return ReflectionProperty[] */
