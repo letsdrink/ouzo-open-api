@@ -36,7 +36,8 @@ class OpenApiFactory
                     ->setUrl($url),
             ]);
 
-        return $this->getChainExecutor()->execute($openApi, Functions::identity());
+        $chainExecutor = $this->getChainExecutor();
+        return $chainExecutor->execute($openApi, Functions::identity());
     }
 
     private function getChainExecutor(): ChainExecutor

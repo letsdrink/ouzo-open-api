@@ -21,8 +21,8 @@ class CachedInternalPathProvider
     public function get(): array
     {
         return Cache::memoize(function () {
-            $webApiRoutes = $this->routesProvider->get();
-            return Arrays::map($webApiRoutes, fn(RouteRule $r) => $this->internalPathFactory->create($r));
+            $routeRules = $this->routesProvider->get();
+            return Arrays::map($routeRules, fn(RouteRule $r) => $this->internalPathFactory->create($r));
         });
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Ouzo\OpenApi;
 
+use Ouzo\Injection\Annotation\Inject;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
-use Ouzo\Injection\Annotation\Inject;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Utilities\Strings;
 use ReflectionClass;
@@ -29,7 +29,7 @@ class InternalPathFactory
 
         $httpMethod = $routeRule->getMethod();
 
-        $details = $this->createInternalPathDetails($routeRule);
+        $details = $this->createInternalPathDetails($routeRule, $reflectionClass);
         $parameters = $this->uriParametersExtractor->extract($details->getUri(), $httpMethod, $reflectionParameters);
         $requestBody = $this->requestBodyExtractor->extract($reflectionParameters, $httpMethod);
         $response = $this->responseExtractor->extract($routeRule, $reflectionMethod);
@@ -37,12 +37,13 @@ class InternalPathFactory
         return new InternalPath($details, $parameters, $requestBody, $response);
     }
 
-    private function createInternalPathDetails(RouteRule $routeRule): InternalPathDetails
+    private function createInternalPathDetails(RouteRule $routeRule, ReflectionClass $reflectionClass): InternalPathDetails
     {
         $uri = $this->sanitizeUri($routeRule);
-        $tag = str_replace('_', ' ', explode('/', $uri)[1]);
-        $summary = str_replace('_', ' ', Strings::camelCaseToUnderscore($routeRule->getAction()));
-        $id = "{$routeRule->getControllerName()}#{$routeRule->getAction()}";
+        $tag = Strings::camelCaseToUnderscore($reflectionClass->getShortName());
+        $action = Strings::camelCaseToUnderscore($routeRule->getAction());
+        $summary = "{$this->removeUnderscore($tag)} {$this->removeUnderscore($action)}";
+        $id = $routeRule->getAction();
         $method = strtolower($routeRule->getMethod());
 
         return new InternalPathDetails($uri, $tag, $summary, $id, $method);
@@ -53,5 +54,10 @@ class InternalPathFactory
         $uri = $routeRule->getUri();
         $uri = preg_replace('/:(.*?)\//', '{\1}/', $uri);
         return preg_replace('/:(.*?)$/', '{\1}', $uri);
+    }
+
+    private function removeUnderscore(?string $string): string
+    {
+        return str_replace('_', ' ', $string);
     }
 }
