@@ -7,6 +7,7 @@ use Ouzo\OpenApi\CachedInternalPathProvider;
 use Ouzo\OpenApi\Extractor\PropertiesExtractor;
 use Ouzo\OpenApi\InternalPath;
 use Ouzo\OpenApi\InternalProperty;
+use Ouzo\OpenApi\Model\Component;
 use Ouzo\OpenApi\Model\OpenApi;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Arrays;
@@ -40,10 +41,9 @@ class ComponentsAppender implements Interceptor
                 $schema = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
                 $properties[$internalProperty->getName()] = $schema;
             }
-            $components[$name] = [
-                'type' => 'object',
-                'properties' => $properties,
-            ];
+            $components[$name] = (new Component())
+                ->setType('object')
+                ->setProperties($properties);
         }
 
         if (!empty($components)) {

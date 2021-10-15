@@ -6,7 +6,7 @@ class Parameter
 {
     private string $name;
     private string $in;
-    private string $description;
+    private ?string $description = null;
     private bool $required;
     private Schema $schema;
 
@@ -32,12 +32,12 @@ class Parameter
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): Parameter
+    public function setDescription(?string $description): Parameter
     {
         $this->description = $description;
         return $this;

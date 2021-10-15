@@ -9,7 +9,7 @@ class OpenApi
     /** @var Server[] */
     private array $servers;
     private array $paths;
-    private ?array $components;
+    private ?array $components = null;
 
     public function getOpenapi(): string
     {

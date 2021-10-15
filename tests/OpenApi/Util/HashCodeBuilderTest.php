@@ -3,6 +3,7 @@
 namespace Ouzo\OpenApi\Util;
 
 use Ouzo\Fixtures\HashCodeClass;
+use Ouzo\Fixtures\HashCodeSubClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -148,5 +149,23 @@ class HashCodeBuilderTest extends TestCase
 
         //then
         $this->assertSame(47806, $hashCodeClass->hashCode());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldCalculateForClassWithHashCodeMethod()
+    {
+        //given
+        $hashCodeClass = new HashCodeClass();
+
+        $hashCodeSubClass = new HashCodeSubClass();
+        $hashCodeSubClass->age = 3;
+
+        //when
+        $hashCodeClass->mixed = $hashCodeSubClass;
+
+        //then
+        $this->assertSame(1261, $hashCodeClass->hashCode());
     }
 }

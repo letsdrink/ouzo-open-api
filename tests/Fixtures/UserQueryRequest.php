@@ -6,4 +6,5 @@ class UserQueryRequest
 {
     private string $name;
     private int $age;
+    private Tag $tag;
 }

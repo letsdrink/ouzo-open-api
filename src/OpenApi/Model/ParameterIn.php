@@ -2,9 +2,7 @@
 
 namespace Ouzo\OpenApi\Model;
 
-use Utilities\Options;
-
-class ParameterIn extends Options
+class ParameterIn
 {
     public const QUERY = 'query';
     public const PATH = 'path';

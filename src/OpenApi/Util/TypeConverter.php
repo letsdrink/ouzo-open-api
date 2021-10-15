@@ -10,6 +10,9 @@ use Ouzo\OpenApi\TypeWrapper\TypeWrapper;
 
 class TypeConverter
 {
+    /**
+     * @codeCoverageIgnore
+     */
     private function __construct()
     {
     }
