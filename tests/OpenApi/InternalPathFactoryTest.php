@@ -72,6 +72,6 @@ class InternalPathFactoryTest extends TestCase
 
         Mock::verify($this->uriParametersExtractor)->extract('/url1/{id}', HttpMethod::GET, []);
         Mock::verify($this->requestBodyExtractor)->extract([], HttpMethod::GET);
-        Mock::verify($this->responseExtractor)->extract($routeRule, Mock::argThat()->isInstanceOf(ReflectionMethod::class));
+        Mock::verify($this->responseExtractor)->extract(HttpStatus::OK, Mock::argThat()->isInstanceOf(ReflectionMethod::class));
     }
 }

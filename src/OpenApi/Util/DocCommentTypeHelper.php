@@ -21,7 +21,7 @@ class DocCommentTypeHelper
     {
     }
 
-    public static function getForReturn(ReflectionMethod $reflectionMethod): ?string
+    public static function getForReturn(ReflectionMethod $reflectionMethod, ?string $default = null): ?string
     {
         $docComment = $reflectionMethod->getDocComment();
 
@@ -34,10 +34,10 @@ class DocCommentTypeHelper
             /** @var Return_|null $return */
             $return = Arrays::getValue($returns, 0);
 
-            return self::findType($return, $reflectionClass);
+            return self::findType($return, $reflectionClass) ?: $default;
         }
 
-        return null;
+        return $default;
     }
 
     public static function getForProperty(ReflectionProperty $reflectionProperty, ?string $default = null): ?string

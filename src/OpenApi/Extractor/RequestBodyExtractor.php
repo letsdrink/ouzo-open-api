@@ -2,14 +2,15 @@
 
 namespace Ouzo\OpenApi\Extractor;
 
-use Ouzo\OpenApi\InternalRequestBody;
-use Model\Utilities\Files\MimeType;
 use Ouzo\Http\HttpMethod;
+use Ouzo\OpenApi\InternalRequestBody;
 use ReflectionClass;
 use ReflectionParameter;
 
 class RequestBodyExtractor
 {
+    private const MIME_TYPE = 'application/json';
+
     /** @param ReflectionParameter[] $reflectionParameters */
     public function extract(array $reflectionParameters, string $httpMethod): ?InternalRequestBody
     {
@@ -26,7 +27,7 @@ class RequestBodyExtractor
 
             $class = $reflectionType->getName();
             $reflectionClass = new ReflectionClass($class);
-            return new InternalRequestBody(MimeType::APPLICATION_JSON, $reflectionClass);
+            return new InternalRequestBody(self::MIME_TYPE, $reflectionClass);
         }
 
         return null;

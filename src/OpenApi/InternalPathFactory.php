@@ -2,11 +2,13 @@
 
 namespace Ouzo\OpenApi;
 
+use Ouzo\Http\HttpStatus;
 use Ouzo\Injection\Annotation\Inject;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
 use Ouzo\Routing\RouteRule;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use ReflectionClass;
 
@@ -28,11 +30,12 @@ class InternalPathFactory
         $reflectionParameters = $reflectionMethod->getParameters();
 
         $httpMethod = $routeRule->getMethod();
+        $responseCode = Arrays::getValue($routeRule->getOptions(), 'code', HttpStatus::OK);
 
         $details = $this->createInternalPathDetails($routeRule, $reflectionClass);
         $parameters = $this->uriParametersExtractor->extract($details->getUri(), $httpMethod, $reflectionParameters);
         $requestBody = $this->requestBodyExtractor->extract($reflectionParameters, $httpMethod);
-        $response = $this->responseExtractor->extract($routeRule, $reflectionMethod);
+        $response = $this->responseExtractor->extract($responseCode, $reflectionMethod);
 
         return new InternalPath($details, $parameters, $requestBody, $response);
     }

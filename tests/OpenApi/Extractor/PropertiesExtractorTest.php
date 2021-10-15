@@ -34,13 +34,14 @@ class PropertiesExtractorTest extends TestCase
 
         //then
         Assert::thatArray($internalProperties)
-            ->hasSize(7)
+            ->hasSize(8)
             ->extracting('getName()', 'getReflectionDeclaringClass()', 'getTypeWrapper()')
             ->containsOnly(
                 ['property1', new ReflectionClass(PropertiesExtractorClass::class), new PrimitiveTypeWrapper('string')],
                 ['property2', new ReflectionClass(PropertiesExtractorClass::class), new PrimitiveTypeWrapper('string')],
                 ['property3', new ReflectionClass(PropertiesExtractorClass::class), new ComplexTypeWrapper(new ReflectionClass(SubPropertiesExtractorClass::class))],
                 ['property4', new ReflectionClass(PropertiesExtractorClass::class), new ArrayTypeWrapperDecorator(new ComplexTypeWrapper(new ReflectionClass(SubPropertiesExtractorClass::class)))],
+                ['property5', new ReflectionClass(PropertiesExtractorClass::class), new ArrayTypeWrapperDecorator(new PrimitiveTypeWrapper('string'))],
                 ['parentProperty1', new ReflectionClass(PropertiesExtractorClass::class), new PrimitiveTypeWrapper('string')],
                 ['parentProperty2', new ReflectionClass(PropertiesExtractorClass::class), new ArrayTypeWrapperDecorator(new PrimitiveTypeWrapper('string'))],
                 ['subProperty1', new ReflectionClass(SubPropertiesExtractorClass::class), new PrimitiveTypeWrapper('integer')],

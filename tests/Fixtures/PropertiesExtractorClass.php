@@ -12,4 +12,6 @@ class PropertiesExtractorClass extends ParentPropertiesExtractorClass
 
     /** @var SubPropertiesExtractorClass[] */
     private array $property4;
+
+    private array $property5;
 }

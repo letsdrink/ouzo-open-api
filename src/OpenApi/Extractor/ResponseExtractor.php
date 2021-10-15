@@ -8,17 +8,13 @@ use Ouzo\OpenApi\TypeWrapper\ComplexTypeWrapper;
 use Ouzo\OpenApi\TypeWrapper\PrimitiveTypeWrapper;
 use Ouzo\OpenApi\Util\DocCommentTypeHelper;
 use Ouzo\OpenApi\Util\TypeConverter;
-use Ouzo\Routing\RouteRule;
-use Ouzo\Utilities\Arrays;
 use ReflectionClass;
 use ReflectionMethod;
 
 class ResponseExtractor
 {
-    public function extract(RouteRule $routeRule, ReflectionMethod $reflectionMethod): InternalResponse
+    public function extract(int $responseCode, ReflectionMethod $reflectionMethod): InternalResponse
     {
-        $responseCode = Arrays::getValue($routeRule->getOptions(), 'code', 200);
-
         if (!$reflectionMethod->hasReturnType()) {
             return new InternalResponse($responseCode);
         }
@@ -31,9 +27,17 @@ class ResponseExtractor
         }
 
         if ($name === 'array') {
-            $reflectionClass = $this->getClassForReturnArray($reflectionMethod);
-            $complexTypeWrapper = new ComplexTypeWrapper($reflectionClass);
-            $arrayTypeWrapperDecorator = new ArrayTypeWrapperDecorator($complexTypeWrapper);
+            $forReturn = DocCommentTypeHelper::getForReturn($reflectionMethod, 'string');
+            $type = TypeConverter::convertPrimitiveToOpenApiType($forReturn);
+
+            if (is_null($type)) {
+                $reflectionClass = new ReflectionClass($forReturn);
+                $typeWrapper = new ComplexTypeWrapper($reflectionClass);
+            } else {
+                $typeWrapper = new PrimitiveTypeWrapper($type);
+            }
+
+            $arrayTypeWrapperDecorator = new ArrayTypeWrapperDecorator($typeWrapper);
             return new InternalResponse($responseCode, $arrayTypeWrapperDecorator);
         }
 
@@ -47,11 +51,5 @@ class ResponseExtractor
         $complexTypeWrapper = new ComplexTypeWrapper($reflectionClass);
 
         return new InternalResponse($responseCode, $complexTypeWrapper);
-    }
-
-    private function getClassForReturnArray(ReflectionMethod $reflectionMethod): ?ReflectionClass
-    {
-        $forReturn = DocCommentTypeHelper::getForReturn($reflectionMethod);
-        return is_null($forReturn) ? null : new ReflectionClass($forReturn);
     }
 }
