@@ -17,9 +17,7 @@ use ReflectionProperty;
 
 class DocCommentTypeHelper
 {
-    /**
-     * @codeCoverageIgnore
-     */
+    /** @codeCoverageIgnore */
     private function __construct()
     {
     }

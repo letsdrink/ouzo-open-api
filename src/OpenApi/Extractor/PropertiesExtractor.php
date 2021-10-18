@@ -4,8 +4,11 @@ namespace Ouzo\OpenApi\Extractor;
 
 use Ouzo\OpenApi\InternalProperty;
 use Ouzo\OpenApi\TypeWrapper\ArrayTypeWrapperDecorator;
+use Ouzo\OpenApi\TypeWrapper\ComplexType;
 use Ouzo\OpenApi\TypeWrapper\ComplexTypeWrapper;
+use Ouzo\OpenApi\TypeWrapper\PrimitiveType;
 use Ouzo\OpenApi\TypeWrapper\PrimitiveTypeWrapper;
+use Ouzo\OpenApi\TypeWrapper\SwaggerType;
 use Ouzo\OpenApi\Util\DocCommentTypeHelper;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Arrays;
@@ -26,7 +29,7 @@ class PropertiesExtractor
             $reflectionType = $reflectionProperty->getType();
 
             if (is_null($reflectionType)) {
-                $typeWrapper = new PrimitiveTypeWrapper('string');
+                $typeWrapper = new PrimitiveTypeWrapper(SwaggerType::STRING);
                 $internalProperties[] = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
                 continue;
             }
@@ -37,12 +40,12 @@ class PropertiesExtractor
             }
 
             $type = $reflectionType->getName();
-            if ($reflectionType->isBuiltin() && !in_array($type, ['array', 'object'])) {
+            if ($reflectionType->isBuiltin() && !in_array($type, [ComplexType::ARRAY, ComplexType::OBJECT])) {
                 $type = TypeConverter::convertPrimitiveToOpenApiType($type);
                 $typeWrapper = new PrimitiveTypeWrapper($type);
             } else {
-                if ($type === 'array') {
-                    $forProperty = DocCommentTypeHelper::getForProperty($reflectionProperty, 'string');
+                if ($type === ComplexType::ARRAY) {
+                    $forProperty = DocCommentTypeHelper::getForProperty($reflectionProperty, PrimitiveType::STRING);
                     $type = TypeConverter::convertPrimitiveToOpenApiType($forProperty);
                     if (is_null($type)) {
                         $tmp = new ReflectionClass($forProperty);

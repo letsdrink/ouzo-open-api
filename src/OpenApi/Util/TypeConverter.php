@@ -6,13 +6,13 @@ use Ouzo\OpenApi\Model\ArraySchema;
 use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\Model\Schema;
 use Ouzo\OpenApi\Model\SimpleSchema;
+use Ouzo\OpenApi\TypeWrapper\PrimitiveType;
+use Ouzo\OpenApi\TypeWrapper\SwaggerType;
 use Ouzo\OpenApi\TypeWrapper\TypeWrapper;
 
 class TypeConverter
 {
-    /**
-     * @codeCoverageIgnore
-     */
+    /** @codeCoverageIgnore */
     private function __construct()
     {
     }
@@ -20,9 +20,9 @@ class TypeConverter
     public static function convertPrimitiveToOpenApiType(string $primitive): ?string
     {
         return match ($primitive) {
-            'int' => 'integer',
-            'bool' => 'boolean',
-            'string', 'mixed' => 'string',
+            PrimitiveType::INTEGER => SwaggerType::INTEGER,
+            PrimitiveType::BOOLEAN => SwaggerType::BOOLEAN,
+            PrimitiveType::STRING, PrimitiveType::MIXED => SwaggerType::STRING,
             default => null,
         };
     }

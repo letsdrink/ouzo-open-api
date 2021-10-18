@@ -9,6 +9,7 @@ use Ouzo\OpenApi\InternalPath;
 use Ouzo\OpenApi\InternalProperty;
 use Ouzo\OpenApi\Model\Component;
 use Ouzo\OpenApi\Model\OpenApi;
+use Ouzo\OpenApi\TypeWrapper\SwaggerType;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Chain\Chain;
@@ -42,7 +43,7 @@ class ComponentsAppender implements Interceptor
                 $properties[$internalProperty->getName()] = $schema;
             }
             $components[$name] = (new Component())
-                ->setType('object')
+                ->setType(SwaggerType::OBJECT)
                 ->setProperties($properties);
         }
 

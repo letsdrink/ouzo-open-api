@@ -4,7 +4,9 @@ namespace Ouzo\OpenApi\Extractor;
 
 use Ouzo\OpenApi\InternalResponse;
 use Ouzo\OpenApi\TypeWrapper\ArrayTypeWrapperDecorator;
+use Ouzo\OpenApi\TypeWrapper\ComplexType;
 use Ouzo\OpenApi\TypeWrapper\ComplexTypeWrapper;
+use Ouzo\OpenApi\TypeWrapper\PrimitiveType;
 use Ouzo\OpenApi\TypeWrapper\PrimitiveTypeWrapper;
 use Ouzo\OpenApi\Util\DocCommentTypeHelper;
 use Ouzo\OpenApi\Util\TypeConverter;
@@ -26,8 +28,8 @@ class ResponseExtractor
             return new InternalResponse($responseCode);
         }
 
-        if ($name === 'array') {
-            $forReturn = DocCommentTypeHelper::getForReturn($reflectionMethod, 'string');
+        if ($name === ComplexType::ARRAY) {
+            $forReturn = DocCommentTypeHelper::getForReturn($reflectionMethod, PrimitiveType::STRING);
             $type = TypeConverter::convertPrimitiveToOpenApiType($forReturn);
 
             if (is_null($type)) {
