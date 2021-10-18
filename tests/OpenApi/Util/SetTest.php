@@ -240,17 +240,4 @@ class SetTest extends TestCase
         //then
         $this->assertEmpty($set->all());
     }
-
-    /**
-     * @test
-     */
-    public function shouldName()
-    {
-        //given
-
-        //when
-        //then
-    }
-
-
 }
