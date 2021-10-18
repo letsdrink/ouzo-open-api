@@ -10,10 +10,10 @@ use Ouzo\OpenApi\TypeWrapper\PrimitiveType;
 use Ouzo\OpenApi\TypeWrapper\PrimitiveTypeWrapper;
 use Ouzo\OpenApi\TypeWrapper\SwaggerType;
 use Ouzo\OpenApi\Util\DocCommentTypeHelper;
+use Ouzo\OpenApi\Util\Set;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Arrays;
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
 
@@ -22,7 +22,7 @@ class PropertiesExtractor
     /** @return InternalProperty[] */
     public function extract(ReflectionClass $reflectionClass): array
     {
-        $internalProperties = [];
+        $internalProperties = new Set();
 
         $reflectionProperties = self::getAllProperties($reflectionClass);
         foreach ($reflectionProperties as $reflectionProperty) {
@@ -30,12 +30,12 @@ class PropertiesExtractor
 
             if (is_null($reflectionType)) {
                 $typeWrapper = new PrimitiveTypeWrapper(SwaggerType::STRING);
-                $internalProperties[] = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
+                $internalProperty = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
+                $internalProperties->add($internalProperty);
                 continue;
             }
 
             if ($reflectionType instanceof ReflectionUnionType) {
-                /** @var ReflectionNamedType $reflectionNamedTypes */
                 $reflectionType = Arrays::first($reflectionType->getTypes());
             }
 
@@ -51,7 +51,7 @@ class PropertiesExtractor
                         $tmp = new ReflectionClass($forProperty);
                         $typeWrapper = new ComplexTypeWrapper($tmp);
 
-                        $internalProperties = array_merge($internalProperties, $this->extract($tmp));
+                        $internalProperties->addAll($this->extract($tmp));
                     } else {
                         $typeWrapper = new PrimitiveTypeWrapper($type);
                     }
@@ -60,13 +60,14 @@ class PropertiesExtractor
                     $tmp = new ReflectionClass($type);
                     $typeWrapper = new ComplexTypeWrapper($tmp);
 
-                    $internalProperties = array_merge($internalProperties, $this->extract($tmp));
+                    $internalProperties->addAll($this->extract($tmp));
                 }
             }
-            $internalProperties[] = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
+            $internalProperty = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
+            $internalProperties->add($internalProperty);
         }
 
-        return Arrays::uniqueBy($internalProperties, fn(InternalProperty $property) => $property->hashCode());
+        return $internalProperties->all();
     }
 
     /** @return ReflectionProperty[] */
