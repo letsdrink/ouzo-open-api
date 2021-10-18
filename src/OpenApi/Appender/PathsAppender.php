@@ -2,17 +2,16 @@
 
 namespace Ouzo\OpenApi\Appender;
 
+use Ouzo\Injection\Annotation\Inject;
 use Ouzo\OpenApi\CachedInternalPathProvider;
 use Ouzo\OpenApi\InternalPath;
 use Ouzo\OpenApi\Model\OpenApi;
 use Ouzo\OpenApi\Model\Path;
-use Ouzo\Injection\Annotation\Inject;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Chain\Chain;
 use Ouzo\Utilities\Chain\ChainExecutor;
-use Ouzo\Utilities\Chain\Interceptor;
 
-class PathsAppender implements Interceptor
+class PathsAppender implements OpenApiAppender
 {
     #[Inject]
     public function __construct(

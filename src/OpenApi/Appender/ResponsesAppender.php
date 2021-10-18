@@ -5,9 +5,8 @@ namespace Ouzo\OpenApi\Appender;
 use Ouzo\OpenApi\Model\Response;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Chain\Chain;
-use Ouzo\Utilities\Chain\Interceptor;
 
-class ResponsesAppender implements Interceptor
+class ResponsesAppender implements PathAppender
 {
     /** @param PathContext $param */
     public function handle(mixed $param, Chain $next): mixed

@@ -13,11 +13,10 @@ use Ouzo\OpenApi\TypeWrapper\SwaggerType;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Chain\Chain;
-use Ouzo\Utilities\Chain\Interceptor;
 use Ouzo\Utilities\FluentArray;
 use ReflectionClass;
 
-class ComponentsAppender implements Interceptor
+class ComponentsAppender implements OpenApiAppender
 {
     #[Inject]
     public function __construct(

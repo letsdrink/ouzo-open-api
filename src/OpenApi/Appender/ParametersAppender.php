@@ -2,16 +2,15 @@
 
 namespace Ouzo\OpenApi\Appender;
 
+use Ouzo\Injection\Annotation\Inject;
 use Ouzo\OpenApi\Extractor\PropertiesExtractor;
 use Ouzo\OpenApi\Model\Parameter;
 use Ouzo\OpenApi\Model\ParameterIn;
 use Ouzo\OpenApi\Util\TypeConverter;
-use Ouzo\Injection\Annotation\Inject;
 use Ouzo\Utilities\Chain\Chain;
-use Ouzo\Utilities\Chain\Interceptor;
 use ReflectionClass;
 
-class ParametersAppender implements Interceptor
+class ParametersAppender implements PathAppender
 {
     #[Inject]
     public function __construct(private PropertiesExtractor $propertiesExtractor)
