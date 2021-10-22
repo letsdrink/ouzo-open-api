@@ -3,7 +3,6 @@
   "minimum-stability": "stable",
   "license": "MIT",
   "require": {
-    "php": ">=8.0",
     "letsdrink/ouzo": "dev-master#779d2e1",
     "symfony/serializer": "5.3.2"
   },
