@@ -37,7 +37,7 @@ class ComponentsAppender implements OpenApiAppender
         $components = [];
         foreach ($groupedInternalProperties as $name => $internalProperties) {
             $properties = [];
-            $required = [];
+            $required = null;
             /** @var InternalProperty[] $internalProperties */
             foreach ($internalProperties as $internalProperty) {
                 $parameterName = $internalProperty->getName();
