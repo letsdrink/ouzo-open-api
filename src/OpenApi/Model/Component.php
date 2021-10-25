@@ -7,6 +7,7 @@ class Component
     private string $type;
     /** @var Schema[] */
     private array $properties;
+    private array $required;
 
     public function getType(): string
     {
@@ -27,6 +28,17 @@ class Component
     public function setProperties(array $properties): Component
     {
         $this->properties = $properties;
+        return $this;
+    }
+
+    public function getRequired(): array
+    {
+        return $this->required;
+    }
+
+    public function setRequired(array $required): Component
+    {
+        $this->required = $required;
         return $this;
     }
 }

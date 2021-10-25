@@ -3,9 +3,13 @@
 namespace Ouzo\Fixtures;
 
 use Ouzo\Fixtures\AnotherNamespace\Category;
+use Ouzo\OpenApi\Attribute\Schema;
 
 class User
 {
+    #[Schema(required: true)]
+    private string $login;
+
     private array $withoutDocs;
 
     /** @var int[] */

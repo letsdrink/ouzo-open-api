@@ -37,13 +37,22 @@ class ComponentsAppender implements OpenApiAppender
         $components = [];
         foreach ($groupedInternalProperties as $name => $internalProperties) {
             $properties = [];
+            $required = [];
+            /** @var InternalProperty[] $internalProperties */
             foreach ($internalProperties as $internalProperty) {
-                $schema = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
-                $properties[$internalProperty->getName()] = $schema;
+                $parameterName = $internalProperty->getName();
+
+                $properties[$parameterName] = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
+
+                $schemaAttribute = $internalProperty->getSchema();
+                if ($schemaAttribute?->isRequired()) {
+                    $required[] = $parameterName;
+                }
             }
             $components[$name] = (new Component())
                 ->setType(SwaggerType::OBJECT)
-                ->setProperties($properties);
+                ->setProperties($properties)
+                ->setRequired($required);
         }
 
         if (!empty($components)) {

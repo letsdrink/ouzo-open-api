@@ -2,6 +2,7 @@
 
 namespace Ouzo\OpenApi\Extractor;
 
+use Ouzo\OpenApi\Attribute\Schema;
 use Ouzo\OpenApi\InternalProperty;
 use Ouzo\OpenApi\TypeWrapper\ArrayTypeWrapperDecorator;
 use Ouzo\OpenApi\TypeWrapper\ComplexType;
@@ -28,9 +29,11 @@ class PropertiesExtractor
         foreach ($reflectionProperties as $reflectionProperty) {
             $reflectionType = $reflectionProperty->getType();
 
+            $schema = $this->getSchemaAttribute($reflectionProperty);
+
             if (is_null($reflectionType)) {
                 $typeWrapper = new PrimitiveTypeWrapper(SwaggerType::STRING);
-                $internalProperty = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
+                $internalProperty = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper, $schema);
                 $internalProperties->add($internalProperty);
                 continue;
             }
@@ -63,7 +66,7 @@ class PropertiesExtractor
                     $internalProperties->addAll($this->extract($tmp));
                 }
             }
-            $internalProperty = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper);
+            $internalProperty = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper, $schema);
             $internalProperties->add($internalProperty);
         }
 
@@ -78,5 +81,16 @@ class PropertiesExtractor
             $result = array_merge($result, $class->getProperties());
         } while ($class = $class->getParentClass());
         return $result;
+    }
+
+    private function getSchemaAttribute(ReflectionProperty $reflectionProperty): ?Schema
+    {
+        $reflectionAttributes = $reflectionProperty->getAttributes(Schema::class);
+        if (empty($reflectionAttributes)) {
+            return null;
+        }
+
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $reflectionAttributes[0]->newInstance();
     }
 }
