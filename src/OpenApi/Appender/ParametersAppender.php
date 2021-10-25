@@ -42,11 +42,13 @@ class ParametersAppender implements PathAppender
                     $internalProperties = $this->propertiesExtractor->extract($reflectionClass);
                     foreach ($internalProperties as $internalProperty) {
                         $schema = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
+                        $schemaAttribute = $internalProperty->getSchema();
+                        $required = !is_null($schemaAttribute) && $schemaAttribute->isRequired();
 
                         $parameters[] = (new Parameter())
                             ->setName($internalProperty->getName())
                             ->setIn(ParameterIn::QUERY)
-                            ->setRequired(true)
+                            ->setRequired($required)
                             ->setSchema($schema);
                     }
                 }

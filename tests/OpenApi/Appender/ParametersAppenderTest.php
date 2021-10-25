@@ -81,8 +81,8 @@ class ParametersAppenderTest extends TestCase
             ->extracting('getName()', 'getIn()', 'getDescription()', 'isRequired()', 'getSchema()')
             ->containsOnly(
                 ['name', ParameterIn::QUERY, null, true, (new SimpleSchema())->setType('string')],
-                ['age', ParameterIn::QUERY, null, true, (new SimpleSchema())->setType('integer')],
-                ['tag', ParameterIn::QUERY, null, true, (new RefSchema())->setRef('#/components/schemas/Tag')]
+                ['age', ParameterIn::QUERY, null, false, (new SimpleSchema())->setType('integer')],
+                ['tag', ParameterIn::QUERY, null, false, (new RefSchema())->setRef('#/components/schemas/Tag')]
             );
 
         Mock::verify($this->chain)->proceed($pathContext);
