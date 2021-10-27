@@ -10,7 +10,7 @@ class Path
     private string $operationId;
     /** @var Parameter[] */
     private ?array $parameters;
-    private ?array $requestBody;
+    private ?RequestBody $requestBody;
     private array $responses;
 
     public function getTags(): array
@@ -57,12 +57,12 @@ class Path
         return $this;
     }
 
-    public function getRequestBody(): ?array
+    public function getRequestBody(): ?RequestBody
     {
         return $this->requestBody;
     }
 
-    public function setRequestBody(?array $requestBody): Path
+    public function setRequestBody(?RequestBody $requestBody): Path
     {
         $this->requestBody = $requestBody;
         return $this;

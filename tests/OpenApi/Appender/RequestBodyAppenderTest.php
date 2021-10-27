@@ -49,8 +49,9 @@ class RequestBodyAppenderTest extends TestCase
         //then
         $requestBody = $path->getRequestBody();
         /** @var RefSchema $schema */
-        $schema = $requestBody['content']['application/json']['schema'];
+        $schema = $requestBody->getContent()['application/json']['schema'];
         $this->assertSame('#/components/schemas/UserRequest', $schema->getRef());
+        $this->assertTrue($requestBody->isRequired());
 
         Mock::verify($this->chain)->proceed($pathContext);
     }
