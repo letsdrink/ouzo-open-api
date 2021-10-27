@@ -13,6 +13,8 @@ use Ouzo\OpenApi\Model\ParameterIn;
 use Ouzo\OpenApi\Model\Path;
 use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\Model\SimpleSchema;
+use Ouzo\OpenApi\OperationIdGenerator;
+use Ouzo\OpenApi\OperationIdRepository;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Tests\Assert;
 use Ouzo\Tests\Mock\Mock;
@@ -35,7 +37,12 @@ class ParametersAppenderTest extends TestCase
         $this->parametersAppender = new ParametersAppender($propertiesExtractor);
 
         $this->chain = Mock::create(Chain::class);
-        $this->internalPathFactory = new InternalPathFactory(new UriParametersExtractor(), new RequestBodyExtractor(), new ResponseExtractor());
+        $this->internalPathFactory = new InternalPathFactory(
+            new UriParametersExtractor(),
+            new RequestBodyExtractor(),
+            new ResponseExtractor(),
+            new OperationIdGenerator(new OperationIdRepository())
+        );
     }
 
     /**

@@ -11,6 +11,8 @@ use Ouzo\OpenApi\Extractor\UriParametersExtractor;
 use Ouzo\OpenApi\InternalPathFactory;
 use Ouzo\OpenApi\Model\OpenApi;
 use Ouzo\OpenApi\Model\Path;
+use Ouzo\OpenApi\OperationIdGenerator;
+use Ouzo\OpenApi\OperationIdRepository;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Tests\Mock\MethodCall;
 use Ouzo\Tests\Mock\Mock;
@@ -41,7 +43,12 @@ class PathsAppenderTest extends TestCase
         $this->pathsAppender = new PathsAppender($this->cachedInternalPathProvider, $this->parametersAppender, $this->requestBodyAppender, $this->responsesAppender);
 
         $this->chain = Mock::create(Chain::class);
-        $this->internalPathFactory = new InternalPathFactory(new UriParametersExtractor(), new RequestBodyExtractor(), new ResponseExtractor());
+        $this->internalPathFactory = new InternalPathFactory(
+            new UriParametersExtractor(),
+            new RequestBodyExtractor(),
+            new ResponseExtractor(),
+            new OperationIdGenerator(new OperationIdRepository())
+        );
     }
 
     /**

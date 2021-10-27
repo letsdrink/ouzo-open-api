@@ -33,7 +33,12 @@ class InternalPathFactoryTest extends TestCase
             ->extract(Mock::anyArgList())
             ->thenReturn(new InternalResponse(HttpStatus::OK));
 
-        $this->internalPathFactory = new InternalPathFactory($this->uriParametersExtractor, $this->requestBodyExtractor, $this->responseExtractor);
+        $this->internalPathFactory = new InternalPathFactory(
+            $this->uriParametersExtractor,
+            $this->requestBodyExtractor,
+            $this->responseExtractor,
+            new OperationIdGenerator(new OperationIdRepository())
+        );
     }
 
     /**

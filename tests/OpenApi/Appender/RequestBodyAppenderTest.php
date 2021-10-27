@@ -10,6 +10,8 @@ use Ouzo\OpenApi\Extractor\UriParametersExtractor;
 use Ouzo\OpenApi\InternalPathFactory;
 use Ouzo\OpenApi\Model\Path;
 use Ouzo\OpenApi\Model\RefSchema;
+use Ouzo\OpenApi\OperationIdGenerator;
+use Ouzo\OpenApi\OperationIdRepository;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Tests\Mock\Mock;
 use Ouzo\Tests\Mock\MockInterface;
@@ -29,7 +31,12 @@ class RequestBodyAppenderTest extends TestCase
         $this->requestBodyAppender = new RequestBodyAppender();
 
         $this->chain = Mock::create(Chain::class);
-        $this->internalPathFactory = new InternalPathFactory(new UriParametersExtractor(), new RequestBodyExtractor(), new ResponseExtractor());
+        $this->internalPathFactory = new InternalPathFactory(
+            new UriParametersExtractor(),
+            new RequestBodyExtractor(),
+            new ResponseExtractor(),
+            new OperationIdGenerator(new OperationIdRepository())
+        );
     }
 
     /**

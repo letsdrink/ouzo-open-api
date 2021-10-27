@@ -17,6 +17,8 @@ use Ouzo\OpenApi\Model\Component;
 use Ouzo\OpenApi\Model\OpenApi;
 use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\Model\SimpleSchema;
+use Ouzo\OpenApi\OperationIdGenerator;
+use Ouzo\OpenApi\OperationIdRepository;
 use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Tests\Assert;
@@ -43,7 +45,12 @@ class ComponentsAppenderTest extends TestCase
         $this->componentsAppender = new ComponentsAppender(new ComponentClassWrapperProvider($this->cachedInternalPathProvider), $propertiesExtractor);
 
         $this->chain = Mock::create(Chain::class);
-        $this->internalPathFactory = new InternalPathFactory(new UriParametersExtractor(), new RequestBodyExtractor(), new ResponseExtractor());
+        $this->internalPathFactory = new InternalPathFactory(
+            new UriParametersExtractor(),
+            new RequestBodyExtractor(),
+            new ResponseExtractor(),
+            new OperationIdGenerator(new OperationIdRepository())
+        );
     }
 
     /**

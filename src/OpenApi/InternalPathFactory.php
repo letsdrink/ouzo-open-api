@@ -18,7 +18,8 @@ class InternalPathFactory
     public function __construct(
         private UriParametersExtractor $uriParametersExtractor,
         private RequestBodyExtractor $requestBodyExtractor,
-        private ResponseExtractor $responseExtractor
+        private ResponseExtractor $responseExtractor,
+        private OperationIdGenerator $operationIdGenerator
     )
     {
     }
@@ -46,10 +47,10 @@ class InternalPathFactory
         $tag = Strings::camelCaseToUnderscore($reflectionClass->getShortName());
         $action = Strings::camelCaseToUnderscore($routeRule->getAction());
         $summary = "{$this->removeUnderscore($tag)} {$this->removeUnderscore($action)}";
-        $id = $routeRule->getAction();
+        $operationId = $this->operationIdGenerator->generateForRouteRule($routeRule);
         $method = strtolower($routeRule->getMethod());
 
-        return new InternalPathDetails($uri, $tag, $summary, $id, $method);
+        return new InternalPathDetails($uri, $tag, $summary, $operationId, $method);
     }
 
     private function sanitizeUri(RouteRule $routeRule): string
