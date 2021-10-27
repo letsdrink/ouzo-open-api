@@ -2,7 +2,7 @@
 
 namespace Ouzo\OpenApi\TypeWrapper;
 
-class SwaggerType
+class OpenApiType
 {
     public const ARRAY = 'array';
     public const BOOLEAN = 'boolean';

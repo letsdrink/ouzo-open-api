@@ -7,7 +7,9 @@ class Component
     private string $type;
     /** @var Schema[] */
     private array $properties;
-    private ?array $required;
+    private ?array $required = null;
+    private ?array $allOf = null;
+    private ?Discriminator $discriminator = null;
 
     public function getType(): string
     {
@@ -39,6 +41,28 @@ class Component
     public function setRequired(?array $required): Component
     {
         $this->required = $required;
+        return $this;
+    }
+
+    public function getAllOf(): ?array
+    {
+        return $this->allOf;
+    }
+
+    public function setAllOf(?array $allOf): Component
+    {
+        $this->allOf = $allOf;
+        return $this;
+    }
+
+    public function getDiscriminator(): ?Discriminator
+    {
+        return $this->discriminator;
+    }
+
+    public function setDiscriminator(?Discriminator $discriminator): Component
+    {
+        $this->discriminator = $discriminator;
         return $this;
     }
 }

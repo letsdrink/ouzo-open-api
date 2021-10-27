@@ -3,6 +3,7 @@
 namespace Ouzo\OpenApi\Appender;
 
 use Ouzo\OpenApi\Model\RefSchema;
+use Ouzo\OpenApi\Util\ComponentPathHelper;
 use Ouzo\Utilities\Chain\Chain;
 
 class RequestBodyAppender implements PathAppender
@@ -16,7 +17,7 @@ class RequestBodyAppender implements PathAppender
         if (!is_null($internalRequestBody)) {
             $reflectionClass = $internalRequestBody->getReflectionClass();
             $requestBody['content'][$internalRequestBody->getMimeType()]['schema'] = (new RefSchema())
-                ->setRef("#/components/schemas/{$reflectionClass->getShortName()}");
+                ->setRef(ComponentPathHelper::getPathForReflectionClass($reflectionClass));
         }
 
         $param->getPath()->setRequestBody($requestBody);

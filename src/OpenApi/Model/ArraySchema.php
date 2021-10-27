@@ -2,7 +2,7 @@
 
 namespace Ouzo\OpenApi\Model;
 
-use Ouzo\OpenApi\TypeWrapper\SwaggerType;
+use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 
 class ArraySchema implements Schema
 {
@@ -10,7 +10,7 @@ class ArraySchema implements Schema
 
     public function getType(): string
     {
-        return SwaggerType::ARRAY;
+        return OpenApiType::ARRAY;
     }
 
     public function getItems(): Schema

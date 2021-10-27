@@ -3,24 +3,25 @@
 namespace Ouzo\OpenApi\Appender;
 
 use Ouzo\Injection\Annotation\Inject;
-use Ouzo\OpenApi\CachedInternalPathProvider;
+use Ouzo\OpenApi\ComponentClassWrapperProvider;
 use Ouzo\OpenApi\Extractor\PropertiesExtractor;
-use Ouzo\OpenApi\InternalPath;
-use Ouzo\OpenApi\InternalProperty;
+use Ouzo\OpenApi\InternalClass;
 use Ouzo\OpenApi\Model\Component;
+use Ouzo\OpenApi\Model\Discriminator;
 use Ouzo\OpenApi\Model\OpenApi;
-use Ouzo\OpenApi\TypeWrapper\SwaggerType;
+use Ouzo\OpenApi\Model\RefSchema;
+use Ouzo\OpenApi\TypeWrapper\OpenApiType;
+use Ouzo\OpenApi\Util\ComponentPathHelper;
 use Ouzo\OpenApi\Util\TypeConverter;
-use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Chain\Chain;
-use Ouzo\Utilities\FluentArray;
 use ReflectionClass;
+use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
 class ComponentsAppender implements OpenApiAppender
 {
     #[Inject]
     public function __construct(
-        private CachedInternalPathProvider $cachedInternalPathProvider,
+        private ComponentClassWrapperProvider $componentClassWrapperProvider,
         private PropertiesExtractor $propertiesExtractor
     )
     {
@@ -29,16 +30,18 @@ class ComponentsAppender implements OpenApiAppender
     /** @param OpenApi $param */
     public function handle(mixed $param, Chain $next): mixed
     {
-        $internalProperties = $this->getInternalProperties();
-
-        /** @var InternalProperty[] $groupedInternalProperties */
-        $groupedInternalProperties = Arrays::groupBy($internalProperties, fn(InternalProperty $property) => $property->getReflectionDeclaringClass()->getShortName());
+        $internalClasses = $this->getInternalClasses();
 
         $components = [];
-        foreach ($groupedInternalProperties as $name => $internalProperties) {
+        foreach ($internalClasses as $internalClass) {
+            $classWrapper = $internalClass->getComponentClassWrapper();
+
+            $reflectionClass = $classWrapper->getReflectionClass();
+            $name = $reflectionClass->getShortName();
             $properties = [];
             $required = null;
-            /** @var InternalProperty[] $internalProperties */
+
+            $internalProperties = $internalClass->getInternalProperties();
             foreach ($internalProperties as $internalProperty) {
                 $parameterName = $internalProperty->getName();
 
@@ -49,10 +52,30 @@ class ComponentsAppender implements OpenApiAppender
                     $required[] = $parameterName;
                 }
             }
-            $components[$name] = (new Component())
-                ->setType(SwaggerType::OBJECT)
-                ->setProperties($properties)
-                ->setRequired($required);
+
+            $discriminator = $this->getDiscriminator($reflectionClass);
+
+            $value = $classWrapper->getAllOfReflectionClass();
+            if (is_null($value)) {
+                $components[$name] = (new Component())
+                    ->setType(OpenApiType::OBJECT)
+                    ->setProperties($properties)
+                    ->setRequired($required)
+                    ->setDiscriminator($discriminator);
+            } else {
+                $refSchema = (new RefSchema())
+                    ->setRef(ComponentPathHelper::getPathForReflectionClass($value));
+                $component = (new Component())
+                    ->setType(OpenApiType::OBJECT)
+                    ->setProperties($properties);
+                $components[$name] = (new Component())
+                    ->setType(OpenApiType::OBJECT)
+                    ->setRequired($required)
+                    ->setAllOf([
+                        $refSchema,
+                        $component,
+                    ]);
+            }
         }
 
         if (!empty($components)) {
@@ -62,38 +85,40 @@ class ComponentsAppender implements OpenApiAppender
         return $next->proceed($param);
     }
 
-    /** @return InternalProperty[] */
-    private function getInternalProperties(): array
+    /** @return InternalClass[] */
+    private function getInternalClasses(): array
     {
-        $reflectionClasses = $this->getReflectionClasses();
+        $componentClassWrappers = $this->componentClassWrapperProvider->get();
 
-        $internalProperties = [];
-        foreach ($reflectionClasses as $reflectionClass) {
-            $internalProperties = array_merge($internalProperties, $this->propertiesExtractor->extract($reflectionClass));
+        $internalClasses = [];
+        foreach ($componentClassWrappers as $componentClassWrapper) {
+            $includeParentProperties = is_null($componentClassWrapper->getAllOfReflectionClass());
+            $internalProperties = $this->propertiesExtractor->extract($componentClassWrapper->getReflectionClass(), $includeParentProperties);
+            $internalClasses[] = new InternalClass($componentClassWrapper, $internalProperties);
         }
 
-        return $internalProperties;
+        return $internalClasses;
     }
 
-    /** @return ReflectionClass[] */
-    private function getReflectionClasses(): array
+    private function getDiscriminator(ReflectionClass $reflectionClass): ?Discriminator
     {
-        $internalPaths = $this->cachedInternalPathProvider->get();
+        $reflectionAttributes = $reflectionClass->getAttributes(DiscriminatorMap::class);
 
-        $requestReflectionClasses = FluentArray::from($internalPaths)
-            ->filter(fn(InternalPath $path) => !is_null($path->getInternalRequestBody()))
-            ->map(fn(InternalPath $path) => $path->getInternalRequestBody()->getReflectionClass())
-            ->toArray();
-        $responseReflectionClasses = FluentArray::from($internalPaths)
-            ->filter(fn(InternalPath $path) => !$path->getInternalResponse()->getTypeWrapper()?->isPrimitive())
-            ->map(fn(InternalPath $path) => $path->getInternalResponse()->getTypeWrapper()?->get())
-            ->toArray();
+        if (empty($reflectionAttributes)) {
+            return null;
+        }
 
-        $reflectionClasses = array_merge($requestReflectionClasses, $responseReflectionClasses);
+        $reflectionAttribute = $reflectionAttributes[0];
+        /** @var DiscriminatorMap $discriminatorMap */
+        $discriminatorMap = $reflectionAttribute->newInstance();
+        $mapping = [];
+        foreach ($discriminatorMap->getMapping() as $k => $v) {
+            $rClass = new ReflectionClass($v);
+            $mapping[$k] = ComponentPathHelper::getPathForReflectionClass($rClass);
+        }
 
-        return FluentArray::from($reflectionClasses)
-            ->filterNotBlank()
-            ->unique()
-            ->toArray();
+        return (new Discriminator())
+            ->setPropertyName($discriminatorMap->getTypeProperty())
+            ->setMapping($mapping);
     }
 }

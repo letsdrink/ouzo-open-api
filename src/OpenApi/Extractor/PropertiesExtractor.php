@@ -9,8 +9,9 @@ use Ouzo\OpenApi\TypeWrapper\ComplexType;
 use Ouzo\OpenApi\TypeWrapper\ComplexTypeWrapper;
 use Ouzo\OpenApi\TypeWrapper\PrimitiveType;
 use Ouzo\OpenApi\TypeWrapper\PrimitiveTypeWrapper;
-use Ouzo\OpenApi\TypeWrapper\SwaggerType;
+use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 use Ouzo\OpenApi\Util\DocCommentTypeHelper;
+use Ouzo\OpenApi\Util\ReflectionUtils;
 use Ouzo\OpenApi\Util\Set;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Arrays;
@@ -21,18 +22,18 @@ use ReflectionUnionType;
 class PropertiesExtractor
 {
     /** @return InternalProperty[] */
-    public function extract(ReflectionClass $reflectionClass): array
+    public function extract(ReflectionClass $reflectionClass, bool $includeParentProperties = true): array
     {
         $internalProperties = new Set();
 
-        $reflectionProperties = self::getAllProperties($reflectionClass);
+        $reflectionProperties = $this->getReflectionProperties($reflectionClass, $includeParentProperties);
         foreach ($reflectionProperties as $reflectionProperty) {
             $reflectionType = $reflectionProperty->getType();
 
             $schema = $this->getSchemaAttribute($reflectionProperty);
 
             if (is_null($reflectionType)) {
-                $typeWrapper = new PrimitiveTypeWrapper(SwaggerType::STRING);
+                $typeWrapper = new PrimitiveTypeWrapper(OpenApiType::STRING);
                 $internalProperty = new InternalProperty($reflectionProperty->getName(), $reflectionClass, $typeWrapper, $schema);
                 $internalProperties->add($internalProperty);
                 continue;
@@ -74,13 +75,11 @@ class PropertiesExtractor
     }
 
     /** @return ReflectionProperty[] */
-    private function getAllProperties(ReflectionClass $class): array
+    private function getReflectionProperties(ReflectionClass $reflectionClass, bool $includeParentProperties): array
     {
-        $result = [];
-        do {
-            $result = array_merge($result, $class->getProperties());
-        } while ($class = $class->getParentClass());
-        return $result;
+        return $includeParentProperties ?
+            ReflectionUtils::getAllProperties($reflectionClass) :
+            ReflectionUtils::getProperties($reflectionClass);
     }
 
     private function getSchemaAttribute(ReflectionProperty $reflectionProperty): ?Schema

@@ -7,7 +7,7 @@ use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\Model\Schema;
 use Ouzo\OpenApi\Model\SimpleSchema;
 use Ouzo\OpenApi\TypeWrapper\PrimitiveType;
-use Ouzo\OpenApi\TypeWrapper\SwaggerType;
+use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 use Ouzo\OpenApi\TypeWrapper\TypeWrapper;
 
 class TypeConverter
@@ -20,9 +20,9 @@ class TypeConverter
     public static function convertPrimitiveToOpenApiType(string $primitive): ?string
     {
         return match ($primitive) {
-            PrimitiveType::INTEGER => SwaggerType::INTEGER,
-            PrimitiveType::BOOLEAN => SwaggerType::BOOLEAN,
-            PrimitiveType::STRING, PrimitiveType::MIXED => SwaggerType::STRING,
+            PrimitiveType::INTEGER => OpenApiType::INTEGER,
+            PrimitiveType::BOOLEAN => OpenApiType::BOOLEAN,
+            PrimitiveType::STRING, PrimitiveType::MIXED => OpenApiType::STRING,
             default => null,
         };
     }
@@ -40,7 +40,7 @@ class TypeConverter
 
         $schema = $typeWrapper->isPrimitive() ?
             (new SimpleSchema())->setType($type) :
-            (new RefSchema())->setRef("#/components/schemas/{$type->getShortName()}");
+            (new RefSchema())->setRef(ComponentPathHelper::getPathForReflectionClass($type));
 
         if ($typeWrapper->isArray()) {
             $schema = (new ArraySchema())->setItems($schema);
