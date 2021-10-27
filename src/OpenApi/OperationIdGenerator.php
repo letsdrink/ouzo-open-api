@@ -16,6 +16,7 @@ class OperationIdGenerator
     public function generateForRouteRule(RouteRule $routeRule): string
     {
         $action = $routeRule->getAction();
+        $action = lcfirst(Strings::underscoreToCamelCase($action));
 
         $hasOperationId = $this->operationIdRepository->hasOperationId($action);
         if ($hasOperationId) {
@@ -23,9 +24,7 @@ class OperationIdGenerator
             $number = preg_replace('/\D/', Strings::EMPTY_STRING, $lastOperationId);
             $i = Strings::isNotBlank($number) ? $number + 1 : 1;
 
-            $newAction = "{$action}_{$i}";
-            $this->operationIdRepository->add($newAction);
-            return $newAction;
+            $action = "{$action}_{$i}";
         }
 
         $this->operationIdRepository->add($action);

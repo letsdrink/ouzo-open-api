@@ -9,6 +9,7 @@ use Ouzo\OpenApi\OperationIdRepository;
 
 class DefaultOpenApiModule implements InjectModule
 {
+    /** @codeCoverageIgnore */
     public function configureBindings(InjectorConfig $config): void
     {
         $config->bind(OperationIdRepository::class)->in(Scope::SINGLETON);

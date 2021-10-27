@@ -4,7 +4,6 @@ namespace Ouzo\OpenApi;
 
 use Ouzo\Utilities\Comparator;
 use Ouzo\Utilities\FluentArray;
-use Ouzo\Utilities\Strings;
 
 class OperationIdRepository
 {
@@ -23,8 +22,13 @@ class OperationIdRepository
     public function getLastOperationId(string $operationId): ?string
     {
         return FluentArray::from($this->operationIds)
-            ->filter(fn(string $id) => Strings::startsWith($id, $operationId))
+            ->filter(fn(string $id) => preg_match("/{$operationId}_\d+/", $id) === 1)
             ->sort(Comparator::reverse(Comparator::natural()))
             ->firstOr(null);
+    }
+
+    public function all(): array
+    {
+        return $this->operationIds;
     }
 }
