@@ -2,6 +2,7 @@
 
 namespace Ouzo\Fixtures;
 
+use Ouzo\OpenApi\Attribute\Hidden;
 use Ouzo\Utilities\Strings;
 
 class UsersController
@@ -51,5 +52,11 @@ class UsersController
 
     public function multipleClassLevels(PropertiesExtractorClass $propertiesExtractorClass): void
     {
+    }
+
+    #[Hidden]
+    public function hiddenMethod(): string
+    {
+        return Strings::EMPTY_STRING;
     }
 }

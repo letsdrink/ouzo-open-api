@@ -8,6 +8,7 @@ use Ouzo\OpenApi\Extractor\PropertiesExtractor;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
+use Ouzo\OpenApi\HiddenChecker;
 use Ouzo\OpenApi\InternalPathFactory;
 use Ouzo\OpenApi\Model\ParameterIn;
 use Ouzo\OpenApi\Model\Path;
@@ -38,6 +39,7 @@ class ParametersAppenderTest extends TestCase
 
         $this->chain = Mock::create(Chain::class);
         $this->internalPathFactory = new InternalPathFactory(
+            new HiddenChecker(),
             new UriParametersExtractor(),
             new RequestBodyExtractor(),
             new ResponseExtractor(),

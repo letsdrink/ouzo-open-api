@@ -16,6 +16,7 @@ class InternalPathFactory
 {
     #[Inject]
     public function __construct(
+        private HiddenChecker $hiddenChecker,
         private UriParametersExtractor $uriParametersExtractor,
         private RequestBodyExtractor $requestBodyExtractor,
         private ResponseExtractor $responseExtractor,
@@ -24,8 +25,12 @@ class InternalPathFactory
     {
     }
 
-    public function create(RouteRule $routeRule): InternalPath
+    public function create(RouteRule $routeRule): ?InternalPath
     {
+        if ($this->hiddenChecker->isHidden($routeRule)) {
+            return null;
+        }
+
         $reflectionClass = new ReflectionClass($routeRule->getController());
         $reflectionMethod = $reflectionClass->getMethod($routeRule->getAction());
         $reflectionParameters = $reflectionMethod->getParameters();

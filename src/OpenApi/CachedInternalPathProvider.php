@@ -4,8 +4,8 @@ namespace Ouzo\OpenApi;
 
 use Ouzo\Injection\Annotation\Inject;
 use Ouzo\Routing\RouteRule;
-use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Cache;
+use Ouzo\Utilities\FluentArray;
 
 class CachedInternalPathProvider
 {
@@ -22,7 +22,10 @@ class CachedInternalPathProvider
     {
         return Cache::memoize(function () {
             $routeRules = $this->routesProvider->get();
-            return Arrays::map($routeRules, fn(RouteRule $r) => $this->internalPathFactory->create($r));
+            return FluentArray::from($routeRules)
+                ->map(fn(RouteRule $r) => $this->internalPathFactory->create($r))
+                ->filterNotBlank()
+                ->toArray();
         });
     }
 }

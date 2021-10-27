@@ -8,6 +8,7 @@ use Ouzo\OpenApi\CachedInternalPathProvider;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
+use Ouzo\OpenApi\HiddenChecker;
 use Ouzo\OpenApi\InternalPathFactory;
 use Ouzo\OpenApi\Model\OpenApi;
 use Ouzo\OpenApi\Model\Path;
@@ -44,6 +45,7 @@ class PathsAppenderTest extends TestCase
 
         $this->chain = Mock::create(Chain::class);
         $this->internalPathFactory = new InternalPathFactory(
+            new HiddenChecker(),
             new UriParametersExtractor(),
             new RequestBodyExtractor(),
             new ResponseExtractor(),

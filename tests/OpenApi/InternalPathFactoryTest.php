@@ -34,6 +34,7 @@ class InternalPathFactoryTest extends TestCase
             ->thenReturn(new InternalResponse(HttpStatus::OK));
 
         $this->internalPathFactory = new InternalPathFactory(
+            new HiddenChecker(),
             $this->uriParametersExtractor,
             $this->requestBodyExtractor,
             $this->responseExtractor,
