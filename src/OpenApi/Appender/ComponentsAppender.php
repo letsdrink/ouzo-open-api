@@ -13,6 +13,7 @@ use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 use Ouzo\OpenApi\Util\ComponentPathHelper;
 use Ouzo\OpenApi\Util\TypeConverter;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Chain\Chain;
 use ReflectionClass;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
@@ -38,43 +39,52 @@ class ComponentsAppender implements OpenApiAppender
 
             $reflectionClass = $classWrapper->getReflectionClass();
             $name = $reflectionClass->getShortName();
-            $properties = [];
-            $required = null;
+            $classNameToParametersToSchema = [];
+            $classNameToRequired = null;
+            $discriminator = $this->getDiscriminator($reflectionClass);
 
             $internalProperties = $internalClass->getInternalProperties();
             foreach ($internalProperties as $internalProperty) {
                 $parameterName = $internalProperty->getName();
 
-                $properties[$parameterName] = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
+                $shortName = $internalProperty->getReflectionDeclaringClass()->getShortName();
+                $classNameToParametersToSchema[$shortName][$parameterName] = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
 
                 $schemaAttribute = $internalProperty->getSchema();
                 if ($schemaAttribute?->isRequired()) {
-                    $required[] = $parameterName;
+                    $classNameToRequired[$shortName][] = $parameterName;
                 }
             }
 
-            $discriminator = $this->getDiscriminator($reflectionClass);
+            $allOfReflectionClass = $classWrapper->getAllOfReflectionClass();
+            if (!is_null($allOfReflectionClass)) {
 
-            $value = $classWrapper->getAllOfReflectionClass();
-            if (is_null($value)) {
-                $components[$name] = (new Component())
-                    ->setType(OpenApiType::OBJECT)
-                    ->setProperties($properties)
-                    ->setRequired($required)
-                    ->setDiscriminator($discriminator);
-            } else {
                 $refSchema = (new RefSchema())
-                    ->setRef(ComponentPathHelper::getPathForReflectionClass($value));
-                $component = (new Component())
-                    ->setType(OpenApiType::OBJECT)
-                    ->setProperties($properties);
+                    ->setRef(ComponentPathHelper::getPathForReflectionClass($allOfReflectionClass));
+
+                $tmpComponents = [];
+                foreach ($classNameToParametersToSchema as $parameterToSchema) {
+                    $tmpComponents = (new Component())
+                        ->setType(OpenApiType::OBJECT)
+                        ->setProperties($parameterToSchema);
+                }
+
                 $components[$name] = (new Component())
                     ->setType(OpenApiType::OBJECT)
-                    ->setRequired($required)
+                    ->setRequired($classNameToRequired)
                     ->setAllOf([
                         $refSchema,
-                        $component,
+                        $tmpComponents,
                     ]);
+            } else {
+                foreach ($classNameToParametersToSchema as $className => $parameterToSchema) {
+                    $required = !is_null($classNameToRequired) ? Arrays::getValue($classNameToRequired, $className) : null;
+                    $components[$className] = (new Component())
+                        ->setType(OpenApiType::OBJECT)
+                        ->setProperties($parameterToSchema)
+                        ->setRequired($required)
+                        ->setDiscriminator($discriminator);
+                }
             }
         }
 

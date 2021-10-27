@@ -202,4 +202,41 @@ class ComponentsAppenderTest extends TestCase
 
         $this->assertFalse(false);
     }
+
+    /**
+     * @test
+     */
+    public function shouldAppendAllClassesEvenIfTheyAreUsedInFields()
+    {
+        //given
+        $routeRule = new RouteRule(HttpMethod::POST, '/url', UsersController::class, 'multipleClassLevels', true);
+
+        Mock::when($this->cachedInternalPathProvider)->get()->thenReturn([
+            $this->internalPathFactory->create($routeRule),
+        ]);
+
+        $openApi = new OpenApi();
+
+        //when
+        $this->componentsAppender->handle($openApi, $this->chain);
+
+        //then
+        $components = $openApi->getComponents();
+        $schemas = $components['schemas'];
+        Assert::thatArray($schemas)
+            ->keys()
+            ->containsOnly('PropertiesExtractorClass', 'SubPropertiesExtractorClass');
+
+        /** @var Component $propertiesExtractorClass */
+        $propertiesExtractorClass = $schemas['PropertiesExtractorClass'];
+        Assert::thatArray($propertiesExtractorClass->getProperties())
+            ->keys()
+            ->containsOnly('property1', 'property2', 'property3', 'property4', 'property5', 'parentProperty1', 'parentProperty2');
+
+        /** @var Component $subPropertiesExtractorClass */
+        $subPropertiesExtractorClass = $schemas['SubPropertiesExtractorClass'];
+        Assert::thatArray($subPropertiesExtractorClass->getProperties())
+            ->keys()
+            ->containsOnly('subProperty1');
+    }
 }

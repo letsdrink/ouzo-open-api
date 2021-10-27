@@ -48,4 +48,8 @@ class UsersController
     {
         return [];
     }
+
+    public function multipleClassLevels(PropertiesExtractorClass $propertiesExtractorClass): void
+    {
+    }
 }
