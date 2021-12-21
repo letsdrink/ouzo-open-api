@@ -4,7 +4,7 @@ namespace Ouzo\OpenApi\Appender;
 
 use Ouzo\Fixtures\UsersController;
 use Ouzo\Http\HttpMethod;
-use Ouzo\OpenApi\Extractor\PropertiesExtractor;
+use Ouzo\OpenApi\Extractor\ClassExtractor;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
@@ -33,9 +33,9 @@ class ParametersAppenderTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $propertiesExtractor = new PropertiesExtractor();
+        $classExtractor = new ClassExtractor();
 
-        $this->parametersAppender = new ParametersAppender($propertiesExtractor);
+        $this->parametersAppender = new ParametersAppender($classExtractor);
 
         $this->chain = Mock::create(Chain::class);
         $this->internalPathFactory = new InternalPathFactory(
@@ -91,10 +91,10 @@ class ParametersAppenderTest extends TestCase
             ->containsOnly(
                 ['name', ParameterIn::QUERY, null, true, (new SimpleSchema())->setType('string')],
                 ['age', ParameterIn::QUERY, null, false, (new SimpleSchema())->setType('integer')],
-                ['tag', ParameterIn::QUERY, null, false, (new RefSchema())->setRef('#/components/schemas/Tag')]
+                ['tag', ParameterIn::QUERY, null, false, (new RefSchema())->setRef('#/components/schemas/Tag')],
+                ['tagName', ParameterIn::QUERY, null, false, (new SimpleSchema())->setType('string')]
             );
 
         Mock::verify($this->chain)->proceed($pathContext);
     }
-
 }

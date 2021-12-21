@@ -10,7 +10,6 @@ class InternalProperty
 {
     public function __construct(
         private string $name,
-        private ReflectionClass $reflectionDeclaringClass,
         private TypeWrapper $typeWrapper,
         private ?Schema $schema
     )
@@ -20,11 +19,6 @@ class InternalProperty
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getReflectionDeclaringClass(): ReflectionClass
-    {
-        return $this->reflectionDeclaringClass;
     }
 
     public function getTypeWrapper(): TypeWrapper

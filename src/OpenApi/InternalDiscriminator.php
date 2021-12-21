@@ -4,13 +4,19 @@ namespace Ouzo\OpenApi;
 
 use ReflectionClass;
 
-class ComponentClassWrapper
+class InternalDiscriminator
 {
     public function __construct(
+        private string $name,
         private ReflectionClass $reflectionClass,
-        private ?ReflectionClass $allOfReflectionClass = null
+        private string $typeProperty
     )
     {
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public function getReflectionClass(): ReflectionClass
@@ -18,8 +24,8 @@ class ComponentClassWrapper
         return $this->reflectionClass;
     }
 
-    public function getAllOfReflectionClass(): ?ReflectionClass
+    public function getTypeProperty(): string
     {
-        return $this->allOfReflectionClass;
+        return $this->typeProperty;
     }
 }

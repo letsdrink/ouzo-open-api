@@ -8,4 +8,9 @@ class MessagesController
     {
         return new DirectMessage();
     }
+
+    public function multipleMessages(): Messages
+    {
+        return new Messages();
+    }
 }

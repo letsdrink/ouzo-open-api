@@ -2,24 +2,38 @@
 
 namespace Ouzo\OpenApi;
 
+use ReflectionClass;
+
 class InternalClass
 {
-    /** @param InternalProperty[] $internalProperties */
     public function __construct(
-        private ComponentClassWrapper $componentClassWrapper,
-        private array $internalProperties
+        private ReflectionClass $reflectionClass,
+        private array $properties,
+        private ?array $discriminator,
+        private ?ReflectionClass $ref = null
     )
     {
     }
 
-    public function getComponentClassWrapper(): ComponentClassWrapper
+    public function getReflectionClass(): ReflectionClass
     {
-        return $this->componentClassWrapper;
+        return $this->reflectionClass;
     }
 
     /** @return InternalProperty[] */
-    public function getInternalProperties(): array
+    public function getProperties(): array
     {
-        return $this->internalProperties;
+        return $this->properties;
+    }
+
+    /** @return InternalDiscriminator[]|null */
+    public function getDiscriminator(): ?array
+    {
+        return $this->discriminator;
+    }
+
+    public function getRef(): ?ReflectionClass
+    {
+        return $this->ref;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Ouzo\OpenApi\Model;
 
+use Ouzo\Utilities\ToString\ToStringBuilder;
+use Ouzo\Utilities\ToString\ToStringStyle;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class RefSchema implements Schema
@@ -18,5 +20,12 @@ class RefSchema implements Schema
     {
         $this->ref = $ref;
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (new ToStringBuilder($this, ToStringStyle::shortPrefixStyle()))
+            ->append('ref', $this->ref)
+            ->toString();
     }
 }

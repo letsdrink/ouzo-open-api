@@ -6,8 +6,8 @@ use Ouzo\Fixtures\Polymorphism\MessagesController;
 use Ouzo\Fixtures\UsersController;
 use Ouzo\Http\HttpMethod;
 use Ouzo\OpenApi\CachedInternalPathProvider;
-use Ouzo\OpenApi\ComponentClassWrapperProvider;
-use Ouzo\OpenApi\Extractor\PropertiesExtractor;
+use Ouzo\OpenApi\ReflectionClassesProvider;
+use Ouzo\OpenApi\Extractor\ClassExtractor;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
@@ -41,9 +41,9 @@ class ComponentsAppenderTest extends TestCase
     {
         parent::setUp();
         $this->cachedInternalPathProvider = Mock::create(CachedInternalPathProvider::class);
-        $propertiesExtractor = new PropertiesExtractor();
+        $classExtractor = new ClassExtractor();
 
-        $this->componentsAppender = new ComponentsAppender(new ComponentClassWrapperProvider($this->cachedInternalPathProvider), $propertiesExtractor);
+        $this->componentsAppender = new ComponentsAppender(new ReflectionClassesProvider($this->cachedInternalPathProvider), $classExtractor);
 
         $this->chain = Mock::create(Chain::class);
         $this->internalPathFactory = new InternalPathFactory(
@@ -201,8 +201,6 @@ class ComponentsAppenderTest extends TestCase
             ->containsOnly((new SimpleSchema())->setType('integer'), (new SimpleSchema())->setType('string'))
             ->keys()
             ->containsOnly('userId', 'body');
-
-        $this->assertFalse(false);
     }
 
     /**
@@ -240,5 +238,91 @@ class ComponentsAppenderTest extends TestCase
         Assert::thatArray($subPropertiesExtractorClass->getProperties())
             ->keys()
             ->containsOnly('subProperty1');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldExtractPolymorphicParametersFromWrapperClass()
+    {
+        //given
+        $routeRule = new RouteRule(HttpMethod::GET, '/url', MessagesController::class, 'multipleMessages', true);
+
+        Mock::when($this->cachedInternalPathProvider)->get()->thenReturn([
+            $this->internalPathFactory->create($routeRule),
+        ]);
+
+        $openApi = new OpenApi();
+
+        //when
+        $this->componentsAppender->handle($openApi, $this->chain);
+
+        //then
+        $components = $openApi->getComponents();
+
+        $schemas = $components['schemas'];
+        Assert::thatArray($schemas)
+            ->keys()
+            ->containsOnly('Message', 'CommentMessage', 'DirectMessage', 'Messages');
+
+        /** @var Component $message */
+        $messages = $schemas['Messages'];
+        $this->assertSame(OpenApiType::OBJECT, $messages->getType());
+        Assert::thatArray($messages->getProperties())
+            ->containsOnly((new ArraySchema())->setItems((new RefSchema())->setRef('#/components/schemas/Message')))
+            ->keys()
+            ->containsOnly('messages');
+        $this->assertNull($messages->getRequired());
+        $this->assertNull($messages->getDiscriminator());
+
+        /** @var Component $message */
+        $message = $schemas['Message'];
+        $this->assertSame(OpenApiType::OBJECT, $message->getType());
+        Assert::thatArray($message->getProperties())
+            ->containsOnly((new SimpleSchema())->setType('string'))
+            ->keys()
+            ->containsOnly('messageType');
+        Assert::thatArray($message->getRequired())
+            ->containsOnly('messageType');
+        $discriminator = $message->getDiscriminator();
+        $this->assertSame('messageType', $discriminator->getPropertyName());
+        Assert::thatArray($discriminator->getMapping())->containsKeyAndValue([
+            'COMMENT' => '#/components/schemas/CommentMessage',
+            'DIRECT' => '#/components/schemas/DirectMessage',
+        ]);
+
+        /** @var Component $commentMessage */
+        $commentMessage = $schemas['CommentMessage'];
+        $this->assertSame(OpenApiType::OBJECT, $commentMessage->getType());
+        $this->assertNull($commentMessage->getRequired());
+        $allOf = $commentMessage->getAllOf();
+        $this->assertCount(2, $allOf);
+        /** @var RefSchema $ref */
+        $ref = $allOf[0];
+        $this->assertSame('#/components/schemas/Message', $ref->getRef());
+        /** @var Component $component */
+        $component = $allOf[1];
+        $this->assertSame(OpenApiType::OBJECT, $component->getType());
+        Assert::thatArray($component->getProperties())
+            ->containsOnly((new SimpleSchema())->setType('string'))
+            ->keys()
+            ->containsOnly('comment');
+
+        /** @var Component $directMessage */
+        $directMessage = $schemas['DirectMessage'];
+        $this->assertSame(OpenApiType::OBJECT, $directMessage->getType());
+        $this->assertNull($directMessage->getRequired());
+        $allOf = $directMessage->getAllOf();
+        $this->assertCount(2, $allOf);
+        /** @var RefSchema $ref */
+        $ref = $allOf[0];
+        $this->assertSame('#/components/schemas/Message', $ref->getRef());
+        /** @var Component $component */
+        $component = $allOf[1];
+        $this->assertSame(OpenApiType::OBJECT, $component->getType());
+        Assert::thatArray($component->getProperties())
+            ->containsOnly((new SimpleSchema())->setType('integer'), (new SimpleSchema())->setType('string'))
+            ->keys()
+            ->containsOnly('userId', 'body');
     }
 }

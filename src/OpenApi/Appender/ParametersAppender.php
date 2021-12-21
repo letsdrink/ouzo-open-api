@@ -3,7 +3,8 @@
 namespace Ouzo\OpenApi\Appender;
 
 use Ouzo\Injection\Annotation\Inject;
-use Ouzo\OpenApi\Extractor\PropertiesExtractor;
+use Ouzo\OpenApi\Extractor\ClassExtractor;
+use Ouzo\OpenApi\InternalClass;
 use Ouzo\OpenApi\Model\Parameter;
 use Ouzo\OpenApi\Model\ParameterIn;
 use Ouzo\OpenApi\Util\TypeConverter;
@@ -13,7 +14,7 @@ use ReflectionClass;
 class ParametersAppender implements PathAppender
 {
     #[Inject]
-    public function __construct(private PropertiesExtractor $propertiesExtractor)
+    public function __construct(private ClassExtractor $classExtractor)
     {
     }
 
@@ -39,17 +40,21 @@ class ParametersAppender implements PathAppender
                 } else {
                     /** @var ReflectionClass $reflectionClass */
                     $reflectionClass = $typeWrapper->get();
-                    $internalProperties = $this->propertiesExtractor->extract($reflectionClass);
-                    foreach ($internalProperties as $internalProperty) {
-                        $schema = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
-                        $schemaAttribute = $internalProperty->getSchema();
-                        $required = !is_null($schemaAttribute) && $schemaAttribute->isRequired();
 
-                        $parameters[] = (new Parameter())
-                            ->setName($internalProperty->getName())
-                            ->setIn(ParameterIn::QUERY)
-                            ->setRequired($required)
-                            ->setSchema($schema);
+                    /** @var InternalClass[] $internalClasses */
+                    $internalClasses = $this->classExtractor->extract($reflectionClass)->all();
+                    foreach ($internalClasses as $internalClass) {
+                        foreach ($internalClass->getProperties() as $internalProperty) {
+                            $schema = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
+                            $schemaAttribute = $internalProperty->getSchema();
+                            $required = !is_null($schemaAttribute) && $schemaAttribute->isRequired();
+
+                            $parameters[] = (new Parameter())
+                                ->setName($internalProperty->getName())
+                                ->setIn(ParameterIn::QUERY)
+                                ->setRequired($required)
+                                ->setSchema($schema);
+                        }
                     }
                 }
             }

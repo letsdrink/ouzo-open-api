@@ -2,6 +2,9 @@
 
 namespace Ouzo\OpenApi\Model;
 
+use Ouzo\Utilities\ToString\ToStringBuilder;
+use Ouzo\Utilities\ToString\ToStringStyle;
+
 class SimpleSchema implements Schema
 {
     private string $type;
@@ -15,5 +18,12 @@ class SimpleSchema implements Schema
     {
         $this->type = $type;
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (new ToStringBuilder($this, ToStringStyle::shortPrefixStyle()))
+            ->append('type', $this->type)
+            ->toString();
     }
 }

@@ -3,27 +3,26 @@
 namespace Ouzo\OpenApi\Appender;
 
 use Ouzo\Injection\Annotation\Inject;
-use Ouzo\OpenApi\ComponentClassWrapperProvider;
-use Ouzo\OpenApi\Extractor\PropertiesExtractor;
+use Ouzo\OpenApi\ReflectionClassesProvider;
 use Ouzo\OpenApi\InternalClass;
+use Ouzo\OpenApi\Extractor\ClassExtractor;
 use Ouzo\OpenApi\Model\Component;
 use Ouzo\OpenApi\Model\Discriminator;
 use Ouzo\OpenApi\Model\OpenApi;
 use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 use Ouzo\OpenApi\Util\ComponentPathHelper;
+use Ouzo\OpenApi\Util\Set;
 use Ouzo\OpenApi\Util\TypeConverter;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Chain\Chain;
-use ReflectionClass;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
 class ComponentsAppender implements OpenApiAppender
 {
     #[Inject]
     public function __construct(
-        private ComponentClassWrapperProvider $componentClassWrapperProvider,
-        private PropertiesExtractor $propertiesExtractor
+        private ReflectionClassesProvider $reflectionClassesProvider,
+        private ClassExtractor $classExtractor
     )
     {
     }
@@ -31,34 +30,30 @@ class ComponentsAppender implements OpenApiAppender
     /** @param OpenApi $param */
     public function handle(mixed $param, Chain $next): mixed
     {
-        $internalClasses = $this->getInternalClasses();
+        $classes = $this->getAllClasses();
 
         $components = [];
-        foreach ($internalClasses as $internalClass) {
-            $classWrapper = $internalClass->getComponentClassWrapper();
+        foreach ($classes as $class) {
+            $reflectionClass = $class->getReflectionClass();
 
-            $reflectionClass = $classWrapper->getReflectionClass();
             $name = $reflectionClass->getShortName();
             $classNameToParametersToSchema = [];
             $classNameToRequired = null;
-            $discriminator = $this->getDiscriminator($reflectionClass);
 
-            $internalProperties = $internalClass->getInternalProperties();
-            foreach ($internalProperties as $internalProperty) {
+            $parameters = $class->getProperties();
+            foreach ($parameters as $internalProperty) {
                 $parameterName = $internalProperty->getName();
 
-                $shortName = $internalProperty->getReflectionDeclaringClass()->getShortName();
-                $classNameToParametersToSchema[$shortName][$parameterName] = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
+                $classNameToParametersToSchema[$name][$parameterName] = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
 
                 $schemaAttribute = $internalProperty->getSchema();
                 if ($schemaAttribute?->isRequired()) {
-                    $classNameToRequired[$shortName][] = $parameterName;
+                    $classNameToRequired[$name][] = $parameterName;
                 }
             }
 
-            $allOfReflectionClass = $classWrapper->getAllOfReflectionClass();
+            $allOfReflectionClass = $class->getRef();
             if (!is_null($allOfReflectionClass)) {
-
                 $refSchema = (new RefSchema())
                     ->setRef(ComponentPathHelper::getPathForReflectionClass($allOfReflectionClass));
 
@@ -79,6 +74,17 @@ class ComponentsAppender implements OpenApiAppender
             } else {
                 foreach ($classNameToParametersToSchema as $className => $parameterToSchema) {
                     $required = !is_null($classNameToRequired) ? Arrays::getValue($classNameToRequired, $className) : null;
+                    $s = $class->getDiscriminator();
+                    $discriminator = null;
+                    if (!is_null($s)) {
+                        $a = [];
+                        foreach ($s as $itemx) {
+                            $a[$itemx->getName()] = ComponentPathHelper::getPathForReflectionClass($itemx->getReflectionClass());
+                        }
+                        $discriminator = (new Discriminator())
+                            ->setPropertyName($itemx->getTypeProperty())
+                            ->setMapping($a);
+                    }
                     $components[$className] = (new Component())
                         ->setType(OpenApiType::OBJECT)
                         ->setProperties($parameterToSchema)
@@ -96,39 +102,12 @@ class ComponentsAppender implements OpenApiAppender
     }
 
     /** @return InternalClass[] */
-    private function getInternalClasses(): array
+    private function getAllClasses(): array
     {
-        $componentClassWrappers = $this->componentClassWrapperProvider->get();
-
-        $internalClasses = [];
-        foreach ($componentClassWrappers as $componentClassWrapper) {
-            $includeParentProperties = is_null($componentClassWrapper->getAllOfReflectionClass());
-            $internalProperties = $this->propertiesExtractor->extract($componentClassWrapper->getReflectionClass(), $includeParentProperties);
-            $internalClasses[] = new InternalClass($componentClassWrapper, $internalProperties);
+        $set = new Set();
+        foreach ($this->reflectionClassesProvider->get() as $reflectionClass) {
+            $set->addAll($this->classExtractor->extract($reflectionClass)->all());
         }
-
-        return $internalClasses;
-    }
-
-    private function getDiscriminator(ReflectionClass $reflectionClass): ?Discriminator
-    {
-        $reflectionAttributes = $reflectionClass->getAttributes(DiscriminatorMap::class);
-
-        if (empty($reflectionAttributes)) {
-            return null;
-        }
-
-        $reflectionAttribute = $reflectionAttributes[0];
-        /** @var DiscriminatorMap $discriminatorMap */
-        $discriminatorMap = $reflectionAttribute->newInstance();
-        $mapping = [];
-        foreach ($discriminatorMap->getMapping() as $k => $v) {
-            $rClass = new ReflectionClass($v);
-            $mapping[$k] = ComponentPathHelper::getPathForReflectionClass($rClass);
-        }
-
-        return (new Discriminator())
-            ->setPropertyName($discriminatorMap->getTypeProperty())
-            ->setMapping($mapping);
+        return $set->all();
     }
 }
