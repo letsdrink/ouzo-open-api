@@ -6,7 +6,7 @@ class Component
 {
     private string $type;
     /** @var Schema[] */
-    private array $properties;
+    private ?array $properties = null;
     private ?array $required = null;
     private ?array $allOf = null;
     private ?Discriminator $discriminator = null;
@@ -22,12 +22,12 @@ class Component
         return $this;
     }
 
-    public function getProperties(): array
+    public function getProperties(): ?array
     {
         return $this->properties;
     }
 
-    public function setProperties(array $properties): Component
+    public function setProperties(?array $properties): Component
     {
         $this->properties = $properties;
         return $this;
