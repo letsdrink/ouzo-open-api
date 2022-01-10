@@ -6,7 +6,6 @@ use Ouzo\Fixtures\Polymorphism\MessagesController;
 use Ouzo\Fixtures\UsersController;
 use Ouzo\Http\HttpMethod;
 use Ouzo\OpenApi\CachedInternalPathProvider;
-use Ouzo\OpenApi\ReflectionClassesProvider;
 use Ouzo\OpenApi\Extractor\ClassExtractor;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
@@ -20,6 +19,7 @@ use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\Model\SimpleSchema;
 use Ouzo\OpenApi\OperationIdGenerator;
 use Ouzo\OpenApi\OperationIdRepository;
+use Ouzo\OpenApi\ReflectionClassesProvider;
 use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Tests\Assert;
@@ -188,7 +188,8 @@ class ComponentsAppenderTest extends TestCase
         /** @var Component $directMessage */
         $directMessage = $schemas['DirectMessage'];
         $this->assertSame(OpenApiType::OBJECT, $directMessage->getType());
-        $this->assertNull($directMessage->getRequired());
+        Assert::thatArray($directMessage->getRequired())
+            ->containsOnly('userId');
         $allOf = $directMessage->getAllOf();
         $this->assertCount(2, $allOf);
         /** @var RefSchema $ref */
@@ -311,7 +312,8 @@ class ComponentsAppenderTest extends TestCase
         /** @var Component $directMessage */
         $directMessage = $schemas['DirectMessage'];
         $this->assertSame(OpenApiType::OBJECT, $directMessage->getType());
-        $this->assertNull($directMessage->getRequired());
+        Assert::thatArray($directMessage->getRequired())
+            ->containsOnly('userId');
         $allOf = $directMessage->getAllOf();
         $this->assertCount(2, $allOf);
         /** @var RefSchema $ref */

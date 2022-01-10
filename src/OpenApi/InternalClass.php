@@ -9,7 +9,7 @@ class InternalClass
     public function __construct(
         private ReflectionClass $reflectionClass,
         private array $properties,
-        private ?array $discriminator,
+        private ?array $discriminators,
         private ?ReflectionClass $ref = null
     )
     {
@@ -27,9 +27,9 @@ class InternalClass
     }
 
     /** @return InternalDiscriminator[]|null */
-    public function getDiscriminator(): ?array
+    public function getDiscriminators(): ?array
     {
-        return $this->discriminator;
+        return $this->discriminators;
     }
 
     public function getRef(): ?ReflectionClass

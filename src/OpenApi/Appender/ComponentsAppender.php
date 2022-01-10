@@ -3,13 +3,13 @@
 namespace Ouzo\OpenApi\Appender;
 
 use Ouzo\Injection\Annotation\Inject;
-use Ouzo\OpenApi\ReflectionClassesProvider;
-use Ouzo\OpenApi\InternalClass;
 use Ouzo\OpenApi\Extractor\ClassExtractor;
+use Ouzo\OpenApi\InternalClass;
 use Ouzo\OpenApi\Model\Component;
 use Ouzo\OpenApi\Model\Discriminator;
 use Ouzo\OpenApi\Model\OpenApi;
 use Ouzo\OpenApi\Model\RefSchema;
+use Ouzo\OpenApi\ReflectionClassesProvider;
 use Ouzo\OpenApi\TypeWrapper\OpenApiType;
 use Ouzo\OpenApi\Util\ComponentPathHelper;
 use Ouzo\OpenApi\Util\Set;
@@ -64,9 +64,11 @@ class ComponentsAppender implements OpenApiAppender
                         ->setProperties($parameterToSchema);
                 }
 
+                $required = !is_null($classNameToRequired) ? Arrays::getValue($classNameToRequired, $name) : null;
+
                 $components[$name] = (new Component())
                     ->setType(OpenApiType::OBJECT)
-                    ->setRequired($classNameToRequired)
+                    ->setRequired($required)
                     ->setAllOf([
                         $refSchema,
                         $tmpComponents,
@@ -74,16 +76,16 @@ class ComponentsAppender implements OpenApiAppender
             } else {
                 foreach ($classNameToParametersToSchema as $className => $parameterToSchema) {
                     $required = !is_null($classNameToRequired) ? Arrays::getValue($classNameToRequired, $className) : null;
-                    $s = $class->getDiscriminator();
+                    $internalDiscriminators = $class->getDiscriminators();
                     $discriminator = null;
-                    if (!is_null($s)) {
-                        $a = [];
-                        foreach ($s as $itemx) {
-                            $a[$itemx->getName()] = ComponentPathHelper::getPathForReflectionClass($itemx->getReflectionClass());
+                    if (!is_null($internalDiscriminators)) {
+                        $nameToPathMappings = [];
+                        foreach ($internalDiscriminators as $internalDiscriminator) {
+                            $nameToPathMappings[$internalDiscriminator->getName()] = ComponentPathHelper::getPathForReflectionClass($internalDiscriminator->getReflectionClass());
                         }
                         $discriminator = (new Discriminator())
-                            ->setPropertyName($itemx->getTypeProperty())
-                            ->setMapping($a);
+                            ->setPropertyName($internalDiscriminator->getTypeProperty())
+                            ->setMapping($nameToPathMappings);
                     }
                     $components[$className] = (new Component())
                         ->setType(OpenApiType::OBJECT)

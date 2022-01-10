@@ -2,8 +2,11 @@
 
 namespace Ouzo\Fixtures\Polymorphism;
 
+use Ouzo\OpenApi\Attribute\Schema;
+
 class DirectMessage extends Message
 {
+    #[Schema(required: true)]
     private int $userId;
     private string $body;
 
