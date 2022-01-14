@@ -167,6 +167,10 @@ class ComponentsAppenderTest extends TestCase
             'COMMENT' => '#/components/schemas/CommentMessage',
             'DIRECT' => '#/components/schemas/DirectMessage',
         ]);
+        Assert::thatArray($message->getOneOf())->containsOnly(
+            (new RefSchema())->setRef('#/components/schemas/CommentMessage'),
+            (new RefSchema())->setRef('#/components/schemas/DirectMessage')
+        );
 
         /** @var Component $commentMessage */
         $commentMessage = $schemas['CommentMessage'];
@@ -184,6 +188,7 @@ class ComponentsAppenderTest extends TestCase
             ->containsOnly((new SimpleSchema())->setType('string'))
             ->keys()
             ->containsOnly('comment');
+        $this->assertNull($commentMessage->getOneOf());
 
         /** @var Component $directMessage */
         $directMessage = $schemas['DirectMessage'];
@@ -202,6 +207,7 @@ class ComponentsAppenderTest extends TestCase
             ->containsOnly((new SimpleSchema())->setType('integer'), (new SimpleSchema())->setType('string'))
             ->keys()
             ->containsOnly('userId', 'body');
+        $this->assertNull($directMessage->getOneOf());
     }
 
     /**
