@@ -2,6 +2,7 @@
 
 namespace Ouzo\OpenApi\Appender;
 
+use Ouzo\Injection\Annotation\Inject;
 use Ouzo\OpenApi\Extractor\DiscriminatorExtractor;
 use Ouzo\OpenApi\Model\RefSchema;
 use Ouzo\OpenApi\Model\Response;
@@ -11,6 +12,7 @@ use Ouzo\Utilities\Chain\Chain;
 
 class ResponsesAppender implements PathAppender
 {
+    #[Inject]
     public function __construct(private DiscriminatorExtractor $discriminatorExtractor)
     {
     }
