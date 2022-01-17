@@ -79,12 +79,14 @@ class ComponentsAppender implements OpenApiAppender
                     $internalDiscriminators = $class->getDiscriminators();
                     $discriminator = null;
                     if (!is_null($internalDiscriminators)) {
+                        $propertyName = null;
                         $nameToPathMappings = [];
                         foreach ($internalDiscriminators as $internalDiscriminator) {
+                            $propertyName = $internalDiscriminator->getTypeProperty();
                             $nameToPathMappings[$internalDiscriminator->getName()] = ComponentPathHelper::getPathForReflectionClass($internalDiscriminator->getReflectionClass());
                         }
                         $discriminator = (new Discriminator())
-                            ->setPropertyName($internalDiscriminator->getTypeProperty())
+                            ->setPropertyName($propertyName)
                             ->setMapping($nameToPathMappings);
                     }
                     $components[$className] = (new Component())
