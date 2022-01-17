@@ -7,6 +7,7 @@ use Ouzo\Fixtures\UsersController;
 use Ouzo\Http\HttpMethod;
 use Ouzo\OpenApi\CachedInternalPathProvider;
 use Ouzo\OpenApi\Extractor\ClassExtractor;
+use Ouzo\OpenApi\Extractor\DiscriminatorExtractor;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
@@ -41,7 +42,7 @@ class ComponentsAppenderTest extends TestCase
     {
         parent::setUp();
         $this->cachedInternalPathProvider = Mock::create(CachedInternalPathProvider::class);
-        $classExtractor = new ClassExtractor();
+        $classExtractor = new ClassExtractor(new DiscriminatorExtractor());
 
         $this->componentsAppender = new ComponentsAppender(new ReflectionClassesProvider($this->cachedInternalPathProvider), $classExtractor);
 
@@ -269,10 +270,12 @@ class ComponentsAppenderTest extends TestCase
         /** @var Component $message */
         $messages = $schemas['Messages'];
         $this->assertSame(OpenApiType::OBJECT, $messages->getType());
-        Assert::thatArray($messages->getProperties())
-            ->containsOnly((new ArraySchema())->setItems((new RefSchema())->setRef('#/components/schemas/Message')))
-            ->keys()
-            ->containsOnly('messages');
+        $this->assertSame(OpenApiType::ARRAY, $messages->getProperties()['messages']['type']);
+        Assert::thatArray($messages->getProperties()['messages']['items']['oneOf'])
+            ->containsOnly(
+                (new RefSchema())->setRef('#/components/schemas/CommentMessage'),
+                (new RefSchema())->setRef('#/components/schemas/DirectMessage')
+            );
         $this->assertNull($messages->getRequired());
         $this->assertNull($messages->getDiscriminator());
 
@@ -326,5 +329,42 @@ class ComponentsAppenderTest extends TestCase
             ->containsOnly((new SimpleSchema())->setType('integer'), (new SimpleSchema())->setType('string'))
             ->keys()
             ->containsOnly('userId', 'body');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldExtractPolymorphicForSingleMessageWrappedByClass()
+    {
+        //given
+        $routeRule = new RouteRule(HttpMethod::GET, '/url', MessagesController::class, 'wrappedSingleMessage', true);
+
+        Mock::when($this->cachedInternalPathProvider)->get()->thenReturn([
+            $this->internalPathFactory->create($routeRule),
+        ]);
+
+        $openApi = new OpenApi();
+
+        //when
+        $this->componentsAppender->handle($openApi, $this->chain);
+
+        //then
+        $components = $openApi->getComponents();
+
+        $schemas = $components['schemas'];
+        Assert::thatArray($schemas)
+            ->keys()
+            ->containsOnly('Message', 'CommentMessage', 'DirectMessage', 'WrappedMessage');
+
+        /** @var Component $message */
+        $wrappedMessage = $schemas['WrappedMessage'];
+        $this->assertSame(OpenApiType::OBJECT, $wrappedMessage->getType());
+        Assert::thatArray($wrappedMessage->getProperties()['message']['oneOf'])
+            ->containsOnly(
+                (new RefSchema())->setRef('#/components/schemas/CommentMessage'),
+                (new RefSchema())->setRef('#/components/schemas/DirectMessage')
+            );
+        $this->assertNull($wrappedMessage->getRequired());
+        $this->assertNull($wrappedMessage->getDiscriminator());
     }
 }

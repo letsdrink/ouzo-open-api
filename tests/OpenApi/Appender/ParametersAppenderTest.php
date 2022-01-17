@@ -5,6 +5,7 @@ namespace Ouzo\OpenApi\Appender;
 use Ouzo\Fixtures\UsersController;
 use Ouzo\Http\HttpMethod;
 use Ouzo\OpenApi\Extractor\ClassExtractor;
+use Ouzo\OpenApi\Extractor\DiscriminatorExtractor;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
@@ -33,7 +34,7 @@ class ParametersAppenderTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $classExtractor = new ClassExtractor();
+        $classExtractor = new ClassExtractor(new DiscriminatorExtractor());
 
         $this->parametersAppender = new ParametersAppender($classExtractor);
 

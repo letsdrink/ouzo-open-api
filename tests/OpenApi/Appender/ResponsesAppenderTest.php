@@ -2,8 +2,10 @@
 
 namespace Ouzo\OpenApi\Appender;
 
+use Ouzo\Fixtures\Polymorphism\MessagesController;
 use Ouzo\Fixtures\UsersController;
 use Ouzo\Http\HttpMethod;
+use Ouzo\OpenApi\Extractor\DiscriminatorExtractor;
 use Ouzo\OpenApi\Extractor\RequestBodyExtractor;
 use Ouzo\OpenApi\Extractor\ResponseExtractor;
 use Ouzo\OpenApi\Extractor\UriParametersExtractor;
@@ -15,6 +17,7 @@ use Ouzo\OpenApi\Model\Response;
 use Ouzo\OpenApi\OperationIdGenerator;
 use Ouzo\OpenApi\OperationIdRepository;
 use Ouzo\Routing\RouteRule;
+use Ouzo\Tests\Assert;
 use Ouzo\Tests\Mock\Mock;
 use Ouzo\Tests\Mock\MockInterface;
 use Ouzo\Utilities\Chain\Chain;
@@ -30,7 +33,7 @@ class ResponsesAppenderTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->responsesAppender = new ResponsesAppender();
+        $this->responsesAppender = new ResponsesAppender(new DiscriminatorExtractor());
 
         $this->chain = Mock::create(Chain::class);
         $this->internalPathFactory = new InternalPathFactory(
@@ -88,5 +91,31 @@ class ResponsesAppenderTest extends TestCase
         $this->assertNull($response->getContent());
 
         Mock::verify($this->chain)->proceed($pathContext);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldGenerateResponseForDiscriminator()
+    {
+        //given
+        $routeRule = new RouteRule(HttpMethod::GET, '/url1', MessagesController::class, 'singleMessage', true);
+
+        $path = new Path();
+        $pathContext = new PathContext($path, $this->internalPathFactory->create($routeRule));
+
+        //when
+        $this->responsesAppender->handle($pathContext, $this->chain);
+
+        //then
+        /** @var Response $response */
+        $response = $path->getResponses()['200'];
+        $oneOf = $response->getContent()['application/json']['schema']['oneOf'];
+
+        Assert::thatArray($oneOf)
+            ->containsOnly(
+                (new RefSchema())->setRef('#/components/schemas/CommentMessage'),
+                (new RefSchema())->setRef('#/components/schemas/DirectMessage')
+            );
     }
 }

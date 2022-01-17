@@ -4,14 +4,15 @@ namespace Ouzo\OpenApi;
 
 use Ouzo\OpenApi\Attribute\Schema;
 use Ouzo\OpenApi\TypeWrapper\TypeWrapper;
-use ReflectionClass;
 
 class InternalProperty
 {
+    /** @param InternalDiscriminator[]|null $internalDiscriminator */
     public function __construct(
         private string $name,
         private TypeWrapper $typeWrapper,
-        private ?Schema $schema
+        private ?Schema $schema,
+        private ?array $internalDiscriminator = null
     )
     {
     }
@@ -29,5 +30,11 @@ class InternalProperty
     public function getSchema(): ?Schema
     {
         return $this->schema;
+    }
+
+    /** @return InternalDiscriminator[]|null */
+    public function getInternalDiscriminator(): ?array
+    {
+        return $this->internalDiscriminator;
     }
 }

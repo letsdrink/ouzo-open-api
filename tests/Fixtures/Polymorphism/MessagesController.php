@@ -13,4 +13,9 @@ class MessagesController
     {
         return new Messages();
     }
+
+    public function wrappedSingleMessage(): WrappedMessage
+    {
+        return new WrappedMessage();
+    }
 }

@@ -40,11 +40,28 @@ class ComponentsAppender implements OpenApiAppender
             $classNameToParametersToSchema = [];
             $classNameToRequired = null;
 
-            $parameters = $class->getProperties();
-            foreach ($parameters as $internalProperty) {
+            $internalProperties = $class->getProperties();
+            foreach ($internalProperties as $internalProperty) {
                 $parameterName = $internalProperty->getName();
+                $internalDiscriminators = $internalProperty->getInternalDiscriminator();
 
-                $classNameToParametersToSchema[$name][$parameterName] = TypeConverter::convertTypeWrapperToSchema($internalProperty->getTypeWrapper());
+                $typeWrapper = $internalProperty->getTypeWrapper();
+                if (is_null($internalDiscriminators)) {
+                    $classNameToParametersToSchema[$name][$parameterName] = TypeConverter::convertTypeWrapperToSchema($typeWrapper);
+                } else {
+                    $oneOf = null;
+                    foreach ($internalDiscriminators as $internalDiscriminator) {
+                        $oneOf[] = (new RefSchema())
+                            ->setRef(ComponentPathHelper::getPathForReflectionClass($internalDiscriminator->getReflectionClass()));
+                    }
+
+                    if ($typeWrapper->isArray()) {
+                        $classNameToParametersToSchema[$name][$parameterName]['type'] = OpenApiType::ARRAY;
+                        $classNameToParametersToSchema[$name][$parameterName]['items']['oneOf'] = $oneOf;
+                    } else {
+                        $classNameToParametersToSchema[$name][$parameterName]['oneOf'] = $oneOf;
+                    }
+                }
 
                 $schemaAttribute = $internalProperty->getSchema();
                 if ($schemaAttribute?->isRequired()) {

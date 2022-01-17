@@ -2,8 +2,8 @@
 
 namespace Ouzo\OpenApi\Extractor;
 
+use Ouzo\Injection\Annotation\Inject;
 use Ouzo\OpenApi\Attribute\Schema;
-use Ouzo\OpenApi\InternalDiscriminator;
 use Ouzo\OpenApi\InternalClass;
 use Ouzo\OpenApi\InternalProperty;
 use Ouzo\OpenApi\TypeWrapper\ArrayTypeWrapperDecorator;
@@ -20,10 +20,14 @@ use Ouzo\Utilities\Arrays;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionUnionType;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
 class ClassExtractor
 {
+    #[Inject]
+    public function __construct(private DiscriminatorExtractor $discriminatorExtractor)
+    {
+    }
+
     public function extract(ReflectionClass $reflectionClass, ?Set $set = null, ?ReflectionClass $ref = null): Set
     {
         if (is_null($set)) {
@@ -34,6 +38,7 @@ class ClassExtractor
 
         $reflectionProperties = $this->getReflectionProperties($reflectionClass, is_null($ref));
         foreach ($reflectionProperties as $reflectionProperty) {
+            $internalDiscriminators = null;
             $reflectionType = $reflectionProperty->getType();
 
             $schema = $this->getSchemaAttribute($reflectionProperty);
@@ -61,6 +66,7 @@ class ClassExtractor
                         $tmp = new ReflectionClass($forProperty);
                         $this->extract($tmp, $set);
                         $typeWrapper = new ArrayTypeWrapperDecorator(new ComplexTypeWrapper($tmp));
+                        $internalDiscriminators = $this->discriminatorExtractor->extract($tmp);
                     } else {
                         $typeWrapper = new ArrayTypeWrapperDecorator(new PrimitiveTypeWrapper($type));
                     }
@@ -68,12 +74,13 @@ class ClassExtractor
                     $tmp = new ReflectionClass($type);
                     $this->extract($tmp, $set);
                     $typeWrapper = new ComplexTypeWrapper($tmp);
+                    $internalDiscriminators = $this->discriminatorExtractor->extract($tmp);
                 }
             }
-            $p[] = new InternalProperty($reflectionProperty->getName(), $typeWrapper, $schema);
+            $p[] = new InternalProperty($reflectionProperty->getName(), $typeWrapper, $schema, $internalDiscriminators);
         }
 
-        $discriminator = $this->getDiscriminator($reflectionClass);
+        $discriminator = $this->discriminatorExtractor->extract($reflectionClass);
 
         if (!is_null($discriminator)) {
             foreach ($discriminator as $item) {
@@ -83,26 +90,6 @@ class ClassExtractor
 
         $set->add(new InternalClass($reflectionClass, $p, $discriminator, $ref));
         return $set;
-    }
-
-    /** @return InternalDiscriminator[]|null */
-    private function getDiscriminator(ReflectionClass $reflectionClass): ?array
-    {
-        $reflectionAttributes = $reflectionClass->getAttributes(DiscriminatorMap::class);
-
-        if (empty($reflectionAttributes)) {
-            return null;
-        }
-
-        $reflectionAttribute = $reflectionAttributes[0];
-        /** @var DiscriminatorMap $discriminatorMap */
-        $discriminatorMap = $reflectionAttribute->newInstance();
-        $mapping = [];
-        foreach ($discriminatorMap->getMapping() as $k => $v) {
-            $mapping[] = new InternalDiscriminator($k, new ReflectionClass($v), $discriminatorMap->getTypeProperty());
-        }
-
-        return $mapping;
     }
 
     /** @return ReflectionProperty[] */
