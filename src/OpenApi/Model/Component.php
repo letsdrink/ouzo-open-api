@@ -9,7 +9,6 @@ class Component
     private ?array $properties = null;
     private ?array $required = null;
     private ?array $allOf = null;
-    private ?array $oneOf = null;
     private ?Discriminator $discriminator = null;
 
     public function getType(): string
@@ -53,17 +52,6 @@ class Component
     public function setAllOf(?array $allOf): Component
     {
         $this->allOf = $allOf;
-        return $this;
-    }
-
-    public function getOneOf(): ?array
-    {
-        return $this->oneOf;
-    }
-
-    public function setOneOf(?array $oneOf): Component
-    {
-        $this->oneOf = $oneOf;
         return $this;
     }
 
