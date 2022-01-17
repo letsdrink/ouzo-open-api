@@ -24,7 +24,10 @@ class ResponsesAppender implements PathAppender
 
         $typeWrapper = $internalResponse->getTypeWrapper();
 
-        $internalDiscriminators = $this->discriminatorExtractor->extract($typeWrapper?->get());
+        $internalDiscriminators = null;
+        if (!$typeWrapper?->isPrimitive()) {
+            $internalDiscriminators = $this->discriminatorExtractor->extract($typeWrapper?->get());
+        }
 
         $response = (new Response())
             ->setDescription('success');
