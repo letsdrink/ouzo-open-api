@@ -118,10 +118,11 @@ class ComponentsAppenderTest extends TestCase
                 (new ArraySchema())->setItems((new SimpleSchema())->setType('string')),
                 (new ArraySchema())->setItems((new SimpleSchema())->setType('integer')),
                 (new ArraySchema())->setItems((new RefSchema())->setRef('#/components/schemas/Tag')),
-                (new ArraySchema())->setItems((new SimpleSchema())->setType('string'))
+                (new ArraySchema())->setItems((new SimpleSchema())->setType('string')),
+                (new ArraySchema())->setItems((new RefSchema())->setRef('#/components/schemas/Tag'))
             )
             ->keys()
-            ->containsOnly('login', 'withoutDocs', 'withPrimitive', 'withComplex', 'withEmptyTag');
+            ->containsOnly('login', 'withoutDocs', 'withPrimitive', 'withComplex', 'withEmptyTag', 'nullableWithComplex');
 
         Assert::thatArray($component->getRequired())
             ->containsOnly('login');

@@ -9,6 +9,7 @@ use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\String_;
 use ReflectionClass;
@@ -75,7 +76,7 @@ class DocCommentTypeHelper
             String_::class,
         ];
 
-        $type = $array->getValueType();
+        $type = $array instanceof Compound ? $array->get(0)->getValueType() : $array->getValueType();
         if (in_array($type::class, $primitiveTypes)) {
             return $type->__toString();
         }

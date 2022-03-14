@@ -3,6 +3,8 @@
 namespace Ouzo\OpenApi\Model;
 
 use Ouzo\OpenApi\TypeWrapper\OpenApiType;
+use Ouzo\Utilities\ToString\ToStringBuilder;
+use Ouzo\Utilities\ToString\ToStringStyle;
 
 class ArraySchema implements Schema
 {
@@ -22,5 +24,13 @@ class ArraySchema implements Schema
     {
         $this->items = $items;
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (new ToStringBuilder($this, ToStringStyle::shortPrefixStyle()))
+            ->append('type', $this->getType())
+            ->append('items', $this->items)
+            ->toString();
     }
 }
