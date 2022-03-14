@@ -21,6 +21,9 @@ class User
     /** */
     private array $withEmptyTag;
 
+    /** @var Tag[]|null */
+    private ?array $nullableWithComplex;
+
     public function returnWithoutDocs(): array
     {
         return [];
