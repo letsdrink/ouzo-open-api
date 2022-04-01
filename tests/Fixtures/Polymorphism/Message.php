@@ -2,7 +2,7 @@
 
 namespace Ouzo\Fixtures\Polymorphism;
 
-use Ouzo\OpenApi\Attribute\Schema;
+use Ouzo\OpenApi\Attributes\Schema;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
 #[DiscriminatorMap(
@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
     mapping: [
         MessageType::COMMENT => CommentMessage::class,
         MessageType::DIRECT => DirectMessage::class,
+        MessageType::EMPTY => EmptyMessage::class,
     ]
 )]
 abstract class Message

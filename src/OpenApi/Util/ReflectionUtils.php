@@ -27,4 +27,12 @@ class ReflectionUtils
     {
         return $class->getProperties();
     }
+
+    /** @return ReflectionProperty[] */
+    public static function conditionallyGetProperties(ReflectionClass $reflectionClass, bool $includeParentProperties): array
+    {
+        return $includeParentProperties ?
+            self::getAllProperties($reflectionClass) :
+            self::getProperties($reflectionClass);
+    }
 }

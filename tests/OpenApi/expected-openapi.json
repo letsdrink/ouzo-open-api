@@ -1,0 +1,773 @@
+{
+  "components": {
+    "schemas": {
+      "ChildClass": {
+        "properties": {
+          "childProperty": {
+            "type": "string"
+          },
+          "parentProperty": {
+            "$ref": "#/components/schemas/Tag"
+          }
+        },
+        "type": "object"
+      },
+      "CommentMessage": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Message"
+          },
+          {
+            "properties": {
+              "comment": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "DirectMessage": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Message"
+          },
+          {
+            "properties": {
+              "body": {
+                "type": "string"
+              },
+              "userId": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "userId"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "EmptyMessage": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Message"
+          }
+        ]
+      },
+      "Message": {
+        "discriminator": {
+          "mapping": {
+            "COMMENT": "#/components/schemas/CommentMessage",
+            "DIRECT": "#/components/schemas/DirectMessage",
+            "EMPTY": "#/components/schemas/EmptyMessage"
+          },
+          "propertyName": "messageType"
+        },
+        "properties": {
+          "messageType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "messageType"
+        ],
+        "type": "object"
+      },
+      "SampleClass": {
+        "properties": {
+          "arrayOfObjects": {
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "type": "array"
+          },
+          "arrayOfPolymorphicObjects": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CommentMessage"
+                },
+                {
+                  "$ref": "#/components/schemas/DirectMessage"
+                },
+                {
+                  "$ref": "#/components/schemas/EmptyMessage"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "arrayOfSbjectsWithTypeInPhpDoc": {
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "type": "array"
+          },
+          "arrayOfScalars": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "arrayOfScalarsWithTypeInPhpDoc": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "arrayWithoutDocType": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "arrayWithoutType": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "arrayWithoutTypeAndPlainArrayInPhpDoc": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "builtinObject": {
+            "type": "object"
+          },
+          "emptyType": {
+            "type": "string"
+          },
+          "nestedObject": {
+            "$ref": "#/components/schemas/ChildClass"
+          },
+          "nullableArrayOfObjects": {
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "nullableArrayOfObjectsWhenNullableIsFalse": {
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "type": "array"
+          },
+          "nullableArrayOfObjectsWithTypeInPhpDoc": {
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "nullableArrayOfPolymorphicObjects": {
+            "items": {
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CommentMessage"
+                },
+                {
+                  "$ref": "#/components/schemas/DirectMessage"
+                },
+                {
+                  "$ref": "#/components/schemas/EmptyMessage"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "nullableArrayOfScalars": {
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "nullableArrayOfScalarsWhenNullableIsFalse": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "nullableArrayOfScalarsWithTypeInPhpDoc": {
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "nullableArrayWithoutTypeAndPlainArrayInPhpDoc": {
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "nullableBuiltinObject": {
+            "nullable": true,
+            "type": "object"
+          },
+          "nullableBuiltinObjectWhenNullableIsFalse": {
+            "type": "object"
+          },
+          "nullableObject": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Tag"
+              }
+            ],
+            "nullable": true
+          },
+          "nullableObjectWhenNullableIsFalse": {
+            "$ref": "#/components/schemas/Tag"
+          },
+          "nullableObjectWithTypeInPhpDoc": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Tag"
+              }
+            ],
+            "nullable": true
+          },
+          "nullablePolymorphicObjects": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CommentMessage"
+              },
+              {
+                "$ref": "#/components/schemas/DirectMessage"
+              },
+              {
+                "$ref": "#/components/schemas/EmptyMessage"
+              }
+            ]
+          },
+          "nullableScalar": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "nullableScalarWhenNullableIsFalse": {
+            "type": "integer"
+          },
+          "nullableScalarWithTypeInPhpDoc": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "nullableUnionType": {
+            "nullable": true,
+            "type": "string"
+          },
+          "object": {
+            "$ref": "#/components/schemas/Tag"
+          },
+          "objectWithTypeInPhpDoc": {
+            "$ref": "#/components/schemas/Tag"
+          },
+          "polymorphicObject": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CommentMessage"
+              },
+              {
+                "$ref": "#/components/schemas/DirectMessage"
+              },
+              {
+                "$ref": "#/components/schemas/EmptyMessage"
+              }
+            ]
+          },
+          "scalar": {
+            "type": "string"
+          },
+          "scalarWithTypeInPhpDoc": {
+            "type": "boolean"
+          },
+          "unionType": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Tag": {
+        "properties": {
+          "position": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "tagName1": {
+            "type": "string"
+          },
+          "tagName2": {
+            "type": "string"
+          },
+          "tagName3": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tagName2"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "description",
+    "title": "title",
+    "version": "8.3.1"
+  },
+  "openapi": "3.0.1",
+  "paths": {
+    "/users_1": {
+      "get": {
+        "operationId": "scalarInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller scalar in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_10": {
+      "get": {
+        "operationId": "withoutReturn",
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        },
+        "summary": "sample controller without return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_11/{id}": {
+      "get": {
+        "operationId": "scalarInParameter",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        },
+        "summary": "sample controller scalar in parameter",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_12": {
+      "get": {
+        "operationId": "objectInParameter",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "tagName1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagName2",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagName3",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "position",
+            "schema": {
+              "nullable": true,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        },
+        "summary": "sample controller object in parameter",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_13": {
+      "post": {
+        "operationId": "objectInParameter_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tag"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        },
+        "summary": "sample controller object in parameter",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_14/{id}": {
+      "get": {
+        "operationId": "scalarAndObjectInParameter",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagName1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagName2",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagName3",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "position",
+            "schema": {
+              "nullable": true,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        },
+        "summary": "sample controller scalar and object in parameter",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_15/{id}": {
+      "post": {
+        "operationId": "scalarAndObjectInParameter_1",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tag"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        },
+        "summary": "sample controller scalar and object in parameter",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_16": {
+      "get": {
+        "operationId": "objectWithAllTypesInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SampleClass"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller object with all types in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_17": {
+      "get": {
+        "operationId": "arrayInReturnWithoutTypeInPhpDoc",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller array in return without type in php doc",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_2": {
+      "get": {
+        "operationId": "nullableScalarInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller nullable scalar in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_3": {
+      "get": {
+        "operationId": "arrayOfScalarInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller array of scalar in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_4": {
+      "get": {
+        "operationId": "nullableArrayOfScalarInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "nullable": true,
+                  "type": "array"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller nullable array of scalar in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_5": {
+      "get": {
+        "operationId": "objectInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller object in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_6": {
+      "get": {
+        "operationId": "nullableObjectInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Tag"
+                    }
+                  ],
+                  "nullable": true
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller nullable object in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_7": {
+      "get": {
+        "operationId": "arrayOfObjectInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller array of object in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_8": {
+      "get": {
+        "operationId": "nullableArrayOfObjectInReturn",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  },
+                  "nullable": true,
+                  "type": "array"
+                }
+              }
+            },
+            "description": "success"
+          }
+        },
+        "summary": "sample controller nullable array of object in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    },
+    "/users_9": {
+      "get": {
+        "operationId": "voidInReturn",
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        },
+        "summary": "sample controller void in return",
+        "tags": [
+          "sample_controller"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://example.com"
+    }
+  ]
+}

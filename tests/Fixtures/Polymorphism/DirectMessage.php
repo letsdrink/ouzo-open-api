@@ -2,7 +2,7 @@
 
 namespace Ouzo\Fixtures\Polymorphism;
 
-use Ouzo\OpenApi\Attribute\Schema;
+use Ouzo\OpenApi\Attributes\Schema;
 
 class DirectMessage extends Message
 {

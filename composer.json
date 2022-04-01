@@ -3,11 +3,14 @@
   "minimum-stability": "stable",
   "license": "MIT",
   "require": {
-    "letsdrink/ouzo": "dev-master#779d2e1",
+    "letsdrink/ouzo": "dev-master#e5b7654",
     "symfony/serializer": "5.4.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "9.5.10"
+    "phpunit/phpunit": "9.5.10",
+    "symfony/property-access": "5.4.2",
+    "symfony/property-info": "5.4.2",
+    "symfony/yaml": "5.4.2"
   },
   "autoload": {
     "psr-4": {

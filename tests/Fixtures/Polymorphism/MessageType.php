@@ -6,4 +6,5 @@ class MessageType
 {
     public const COMMENT = 'COMMENT';
     public const DIRECT = 'DIRECT';
+    public const EMPTY = 'EMPTY';
 }
