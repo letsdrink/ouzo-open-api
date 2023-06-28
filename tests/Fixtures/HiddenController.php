@@ -10,6 +10,6 @@ class HiddenController
 {
     public function status(): string
     {
-        return Strings::EMPTY_STRING;
+        return Strings::EMPTY;
     }
 }
