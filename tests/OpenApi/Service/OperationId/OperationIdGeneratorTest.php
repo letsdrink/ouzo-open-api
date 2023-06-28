@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Ouzo\OpenApi\Service\OperationId;
 
@@ -6,13 +7,12 @@ use Ouzo\Fixtures\SampleController;
 use Ouzo\Http\HttpMethod;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Tests\Assert;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class OperationIdGeneratorTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldGenerateForRouteRuleWhenExactlyOneIsGenerated()
     {
         //given
@@ -30,9 +30,7 @@ class OperationIdGeneratorTest extends TestCase
         $this->assertSame('scalarInReturn_1', $operationId);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldGenerateForRouteRuleWhenSimilarOperationIsGenerated()
     {
         //given
@@ -52,9 +50,7 @@ class OperationIdGeneratorTest extends TestCase
         $this->assertSame('scalarInReturn_3', $operationId);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSaveGeneratedIdOnMultipleSimilarActions()
     {
         //given
@@ -75,9 +71,7 @@ class OperationIdGeneratorTest extends TestCase
         $this->assertSame('scalarInReturn_4', $operationId);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSanitizeAction()
     {
         //given
@@ -94,9 +88,7 @@ class OperationIdGeneratorTest extends TestCase
         $this->assertSame('snakeName', $operationId);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldGenerateCorrectOperationIdForSimilarActions()
     {
         //given

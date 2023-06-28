@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Ouzo\OpenApi\Service\OperationId;
 
 use Ouzo\Utilities\Comparator;
 use Ouzo\Utilities\FluentArray;
+use Ouzo\Utilities\Strings;
 
 class OperationIdRepository
 {
@@ -20,12 +22,12 @@ class OperationIdRepository
         $this->operationIds[] = $operationId;
     }
 
-    public function getLastOperationId(string $operationId): ?string
+    public function getLastOperationId(string $operationId): string
     {
         return FluentArray::from($this->operationIds)
-            ->filter(fn(string $id) => preg_match("/{$operationId}_\d+/", $id) === 1)
+            ->filter(fn(string $id): bool => preg_match("/{$operationId}_\d+/", $id) === 1)
             ->sort(Comparator::reverse(Comparator::natural()))
-            ->firstOr(null);
+            ->firstOr(Strings::EMPTY);
     }
 
     public function all(): array

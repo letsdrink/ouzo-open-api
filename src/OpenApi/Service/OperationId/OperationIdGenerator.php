@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Ouzo\OpenApi\Service\OperationId;
 
@@ -6,7 +7,7 @@ use Ouzo\Injection\Annotation\Inject;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Utilities\Strings;
 
-class OperationIdGenerator
+readonly class OperationIdGenerator
 {
     #[Inject]
     public function __construct(private OperationIdRepository $operationIdRepository)
@@ -21,7 +22,7 @@ class OperationIdGenerator
         $hasOperationId = $this->operationIdRepository->hasOperationId($action);
         if ($hasOperationId) {
             $lastOperationId = $this->operationIdRepository->getLastOperationId($action);
-            $number = preg_replace('/\D/', Strings::EMPTY_STRING, $lastOperationId);
+            $number = preg_replace('/\D/', Strings::EMPTY, $lastOperationId);
             $i = Strings::isNotBlank($number) ? $number + 1 : 1;
 
             $action = "{$action}_{$i}";
