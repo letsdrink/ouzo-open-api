@@ -90,11 +90,10 @@ class SchemasRepository
         if ($reflectionClass->isEnum()) {
             $reflectionEnum = new ReflectionEnum($reflectionClass->getName());
             if ($reflectionEnum->isBacked()) {
-                $values = [];
-                /** @var ReflectionEnumBackedCase $case */
-                foreach ($reflectionEnum->getCases() as $case) {
-                    $values[] = $case->getBackingValue();
-                }
+                $values = array_map(
+                    fn (ReflectionEnumBackedCase $case) => $case->getBackingValue(),
+                    $reflectionEnum->getCases()
+                );
 
                 if ($type->isNullable()) {
                     $values[] = null;
