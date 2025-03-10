@@ -18,7 +18,6 @@ use Ouzo\Utilities\Arrays;
 use ReflectionClass;
 use ReflectionEnum;
 use ReflectionEnumBackedCase;
-use ReflectionEnumUnitCase;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
 class SchemasRepository
