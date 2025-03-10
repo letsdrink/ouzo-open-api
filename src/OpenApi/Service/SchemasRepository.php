@@ -94,10 +94,6 @@ class SchemasRepository
                     fn (ReflectionEnumBackedCase $case) => $case->getBackingValue(),
                     $reflectionEnum->getCases()
                 );
-
-                if ($type->isNullable()) {
-                    $values[] = null;
-                }
                 $schemaType = TypeUtils::convertPhpTypeToOpenApiType($reflectionEnum->getBackingType()->getName());
                 $schema = (new EnumSchema())->setType($schemaType)->setEnum($values);
             }
