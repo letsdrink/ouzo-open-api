@@ -6,6 +6,7 @@ use Ouzo\OpenApi\Attributes;
 use Ouzo\OpenApi\Model\Media\ArraySchema;
 use Ouzo\OpenApi\Model\Media\ComposedSchema;
 use Ouzo\OpenApi\Model\Media\Discriminator;
+use Ouzo\OpenApi\Model\Media\EnumSchema;
 use Ouzo\OpenApi\Model\Media\Schema;
 use Ouzo\OpenApi\Util\AttributeUtils;
 use Ouzo\OpenApi\Util\ReflectionUtils;
@@ -15,6 +16,9 @@ use Ouzo\OpenApi\Util\Type\Type;
 use Ouzo\OpenApi\Util\Type\TypeUtils;
 use Ouzo\Utilities\Arrays;
 use ReflectionClass;
+use ReflectionEnum;
+use ReflectionEnumBackedCase;
+use ReflectionEnumUnitCase;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 
 class SchemasRepository
@@ -82,6 +86,23 @@ class SchemasRepository
             }
             $schema = (new ComposedSchema())
                 ->setAllOf($allOf);
+        }
+
+        if ($reflectionClass->isEnum()) {
+            $reflectionEnum = new ReflectionEnum($reflectionClass->getName());
+            if ($reflectionEnum->isBacked()) {
+                $values = [];
+                /** @var ReflectionEnumBackedCase $case */
+                foreach ($reflectionEnum->getCases() as $case) {
+                    $values[] = $case->getBackingValue();
+                }
+
+                if ($type->isNullable()) {
+                    $values[] = null;
+                }
+                $schemaType = TypeUtils::convertPhpTypeToOpenApiType($reflectionEnum->getBackingType()->getName());
+                $schema = (new EnumSchema())->setType($schemaType)->setEnum($values);
+            }
         }
 
         $this->schemas[$reflectionClass->getShortName()] = $schema;

@@ -1,6 +1,24 @@
 {
   "components": {
     "schemas": {
+      "BakedIntEnum": {
+        "enum": [
+          0,
+          2,
+          5,
+          9
+        ],
+        "type": "integer"
+      },
+      "BakedStringEnum": {
+        "enum": [
+          "D",
+          "U",
+          "P",
+          "A"
+        ],
+        "type": "string"
+      },
       "ChildClass": {
         "properties": {
           "childProperty": {
@@ -76,6 +94,12 @@
       },
       "SampleClass": {
         "properties": {
+          "arrayOfEnums": {
+            "items": {
+              "$ref": "#/components/schemas/BakedStringEnum"
+            },
+            "type": "array"
+          },
           "arrayOfObjects": {
             "items": {
               "$ref": "#/components/schemas/Tag"
@@ -139,6 +163,9 @@
           },
           "emptyType": {
             "type": "string"
+          },
+          "intEnum": {
+            "$ref": "#/components/schemas/BakedIntEnum"
           },
           "nestedObject": {
             "$ref": "#/components/schemas/ChildClass"
@@ -214,6 +241,14 @@
           "nullableBuiltinObjectWhenNullableIsFalse": {
             "type": "object"
           },
+          "nullableEnum": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BakedIntEnum"
+              }
+            ],
+            "nullable": true
+          },
           "nullableObject": {
             "allOf": [
               {
@@ -286,6 +321,9 @@
           },
           "scalarWithTypeInPhpDoc": {
             "type": "boolean"
+          },
+          "stringEnum": {
+            "$ref": "#/components/schemas/BakedStringEnum"
           },
           "unionType": {
             "type": "string"
