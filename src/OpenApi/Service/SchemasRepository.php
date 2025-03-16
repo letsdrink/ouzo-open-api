@@ -90,9 +90,9 @@ class SchemasRepository
         if ($reflectionClass->isEnum()) {
             $reflectionEnum = new ReflectionEnum($reflectionClass->getName());
             if ($reflectionEnum->isBacked()) {
-                $values = array_map(
-                    fn (ReflectionEnumBackedCase $case) => $case->getBackingValue(),
-                    $reflectionEnum->getCases()
+                $values = Arrays::map(
+                    $reflectionEnum->getCases(),
+                    fn(ReflectionEnumBackedCase $case) => $case->getBackingValue()
                 );
                 $schemaType = TypeUtils::convertPhpTypeToOpenApiType($reflectionEnum->getBackingType()->getName());
                 $schema = (new EnumSchema())->setType($schemaType)->setEnum($values);

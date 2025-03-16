@@ -1,21 +1,21 @@
 {
   "components": {
     "schemas": {
-      "BakedIntEnum": {
+      "BackedIntEnum": {
         "enum": [
-          0,
+          1,
           2,
-          5,
-          9
+          3,
+          4
         ],
         "type": "integer"
       },
-      "BakedStringEnum": {
+      "BackedStringEnum": {
         "enum": [
-          "D",
-          "U",
-          "P",
-          "A"
+          "down",
+          "left",
+          "right",
+          "up"
         ],
         "type": "string"
       },
@@ -92,11 +92,19 @@
         ],
         "type": "object"
       },
+      "NonBackedEnum": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "SampleClass": {
         "properties": {
           "arrayOfEnums": {
             "items": {
-              "$ref": "#/components/schemas/BakedStringEnum"
+              "$ref": "#/components/schemas/BackedStringEnum"
             },
             "type": "array"
           },
@@ -165,10 +173,13 @@
             "type": "string"
           },
           "intEnum": {
-            "$ref": "#/components/schemas/BakedIntEnum"
+            "$ref": "#/components/schemas/BackedIntEnum"
           },
           "nestedObject": {
             "$ref": "#/components/schemas/ChildClass"
+          },
+          "nonBackedEnum": {
+            "$ref": "#/components/schemas/NonBackedEnum"
           },
           "nullableArrayOfObjects": {
             "items": {
@@ -244,7 +255,7 @@
           "nullableEnum": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/BakedIntEnum"
+                "$ref": "#/components/schemas/BackedIntEnum"
               }
             ],
             "nullable": true
@@ -323,7 +334,7 @@
             "type": "boolean"
           },
           "stringEnum": {
-            "$ref": "#/components/schemas/BakedStringEnum"
+            "$ref": "#/components/schemas/BackedStringEnum"
           },
           "unionType": {
             "type": "string"

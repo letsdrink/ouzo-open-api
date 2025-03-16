@@ -74,9 +74,10 @@ class SampleClass
     /** @var Message[]|null */
     private ?array $nullableArrayOfPolymorphicObjects;
 
-    private BakedIntEnum $intEnum;
-    private BakedStringEnum $stringEnum;
-    private ?BakedIntEnum $nullableEnum;
-    /** @var BakedStringEnum[] */
+    private BackedIntEnum $intEnum;
+    private BackedStringEnum $stringEnum;
+    private ?BackedIntEnum $nullableEnum;
+    /** @var BackedStringEnum[] */
     private array $arrayOfEnums;
+    private BasicEnum $nonBackedEnum;
 }
