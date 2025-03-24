@@ -1,6 +1,24 @@
 {
   "components": {
     "schemas": {
+      "BackedIntEnum": {
+        "enum": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "type": "integer"
+      },
+      "BackedStringEnum": {
+        "enum": [
+          "down",
+          "left",
+          "right",
+          "up"
+        ],
+        "type": "string"
+      },
       "ChildClass": {
         "properties": {
           "childProperty": {
@@ -74,8 +92,22 @@
         ],
         "type": "object"
       },
+      "NonBackedEnum": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "SampleClass": {
         "properties": {
+          "arrayOfEnums": {
+            "items": {
+              "$ref": "#/components/schemas/BackedStringEnum"
+            },
+            "type": "array"
+          },
           "arrayOfObjects": {
             "items": {
               "$ref": "#/components/schemas/Tag"
@@ -140,8 +172,14 @@
           "emptyType": {
             "type": "string"
           },
+          "intEnum": {
+            "$ref": "#/components/schemas/BackedIntEnum"
+          },
           "nestedObject": {
             "$ref": "#/components/schemas/ChildClass"
+          },
+          "nonBackedEnum": {
+            "$ref": "#/components/schemas/NonBackedEnum"
           },
           "nullableArrayOfObjects": {
             "items": {
@@ -213,6 +251,14 @@
           },
           "nullableBuiltinObjectWhenNullableIsFalse": {
             "type": "object"
+          },
+          "nullableEnum": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BackedIntEnum"
+              }
+            ],
+            "nullable": true
           },
           "nullableObject": {
             "allOf": [
@@ -286,6 +332,9 @@
           },
           "scalarWithTypeInPhpDoc": {
             "type": "boolean"
+          },
+          "stringEnum": {
+            "$ref": "#/components/schemas/BackedStringEnum"
           },
           "unionType": {
             "type": "string"
