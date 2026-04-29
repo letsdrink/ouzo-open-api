@@ -3,7 +3,7 @@
 namespace Ouzo\Fixtures\Polymorphism;
 
 use Ouzo\OpenApi\Attributes\Schema;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 
 #[DiscriminatorMap(
     typeProperty: 'messageType',

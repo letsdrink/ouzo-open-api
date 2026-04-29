@@ -27,8 +27,8 @@ class ContentService
         $this->schemasRepository->add($type);
 
         if (!is_null($schema)) {
-            $content = (new Content())
-                ->addMediaType(\Ouzo\Http\MediaType::APPLICATION_JSON, (new MediaType())
+            $content = new Content()
+                ->addMediaType(\Ouzo\Http\MediaType::APPLICATION_JSON, new MediaType()
                     ->setSchema($schema)
                 );
         }
@@ -43,8 +43,8 @@ class ContentService
 
         $this->schemasRepository->add($type);
 
-        return (new Content())
-            ->addMediaType(\Ouzo\Http\MediaType::APPLICATION_JSON, (new MediaType())
+        return new Content()
+            ->addMediaType(\Ouzo\Http\MediaType::APPLICATION_JSON, new MediaType()
                 ->setSchema($schema)
             );
     }

@@ -2,7 +2,6 @@
 
 namespace Ouzo\OpenApi;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Ouzo\Fixtures\SampleController;
 use Ouzo\Http\HttpMethod;
 use Ouzo\OpenApi\Customizer\OpenApiCustomizer;
@@ -22,12 +21,13 @@ use Ouzo\OpenApi\Service\RequestBodyService;
 use Ouzo\OpenApi\Service\SchemasRepository;
 use Ouzo\Routing\RouteRule;
 use Ouzo\Utilities\Path;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
@@ -39,10 +39,8 @@ class OpenApiServiceTest extends TestCase
 {
     use WithRouteRulesProvider;
 
-    /**
-     * @test
-     */
-    public function shouldGenerateJsonWithOpenApi()
+    #[Test]
+    public function shouldGenerateJsonWithOpenApi(): void
     {
         //given
         $routeRules = [
@@ -98,13 +96,13 @@ class OpenApiServiceTest extends TestCase
             public function customize(OpenApi $openApi): void
             {
                 $openApi
-                    ->setInfo((new Info())
+                    ->setInfo(new Info()
                         ->setTitle('title')
                         ->setDescription('description')
                         ->setVersion('8.3.1')
                     )
                     ->setServers([
-                        (new Server())
+                        new Server()
                             ->setUrl('https://example.com'),
                     ]);
             }
@@ -113,7 +111,7 @@ class OpenApiServiceTest extends TestCase
 
     private function serialize(OpenApi $openApi): string
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         $normalizers = [new JsonSerializableNormalizer(), new ObjectNormalizer($classMetadataFactory, $metadataAwareNameConverter)];
         $encoders = [new XmlEncoder(), new YamlEncoder(), new JsonEncoder()];

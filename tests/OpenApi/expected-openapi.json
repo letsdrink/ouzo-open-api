@@ -92,7 +92,7 @@
         ],
         "type": "object"
       },
-      "NonBackedEnum": {
+      "BasicEnum": {
         "properties": {
           "name": {
             "type": "string"
@@ -179,7 +179,7 @@
             "$ref": "#/components/schemas/ChildClass"
           },
           "nonBackedEnum": {
-            "$ref": "#/components/schemas/NonBackedEnum"
+            "$ref": "#/components/schemas/BasicEnum"
           },
           "nullableArrayOfObjects": {
             "items": {

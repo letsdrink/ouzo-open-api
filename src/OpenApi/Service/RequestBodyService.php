@@ -22,7 +22,7 @@ class RequestBodyService
         $isObjectAndNotGetHttpMethod = !$reflectionType->isBuiltin() && $httpMethod !== HttpMethod::GET;
         if ($isObjectAndNotGetHttpMethod) {
             $content = $this->contentService->extracted($reflectionParameter);
-            $requestBody = (new RequestBody())
+            $requestBody = new RequestBody()
                 ->setContent($content);
 
             $type = TypeUtils::getForParameter($reflectionParameter);

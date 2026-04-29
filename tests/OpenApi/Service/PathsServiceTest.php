@@ -9,16 +9,15 @@ use Ouzo\OpenApi\Service\OperationId\OperationIdGenerator;
 use Ouzo\OpenApi\Service\OperationId\OperationIdRepository;
 use Ouzo\OpenApi\WithRouteRulesProvider;
 use Ouzo\Routing\RouteRule;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class PathsServiceTest extends TestCase
 {
     use WithRouteRulesProvider;
 
-    /**
-     * @test
-     */
-    public function shouldSkippHiddenResources()
+    #[Test]
+    public function shouldSkippHiddenResources(): void
     {
         //given
         $routeRules = [

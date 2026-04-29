@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 class OperationIdGeneratorTest extends TestCase
 {
     #[Test]
-    public function shouldGenerateForRouteRuleWhenExactlyOneIsGenerated()
+    public function shouldGenerateForRouteRuleWhenExactlyOneIsGenerated(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url1/:id', SampleController::class, 'scalarInReturn', true);
@@ -31,7 +31,7 @@ class OperationIdGeneratorTest extends TestCase
     }
 
     #[Test]
-    public function shouldGenerateForRouteRuleWhenSimilarOperationIsGenerated()
+    public function shouldGenerateForRouteRuleWhenSimilarOperationIsGenerated(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url1/:id', SampleController::class, 'scalarInReturn', true);
@@ -51,7 +51,7 @@ class OperationIdGeneratorTest extends TestCase
     }
 
     #[Test]
-    public function shouldSaveGeneratedIdOnMultipleSimilarActions()
+    public function shouldSaveGeneratedIdOnMultipleSimilarActions(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url1/:id', SampleController::class, 'scalarInReturn', true);
@@ -72,7 +72,7 @@ class OperationIdGeneratorTest extends TestCase
     }
 
     #[Test]
-    public function shouldSanitizeAction()
+    public function shouldSanitizeAction(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url1/:id', SampleController::class, 'snake_name', true);
@@ -89,7 +89,7 @@ class OperationIdGeneratorTest extends TestCase
     }
 
     #[Test]
-    public function shouldGenerateCorrectOperationIdForSimilarActions()
+    public function shouldGenerateCorrectOperationIdForSimilarActions(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url1/:id', SampleController::class, 'update', true);

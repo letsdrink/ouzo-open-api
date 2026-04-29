@@ -34,7 +34,7 @@ class ParametersService
         $type = TypeUtils::getForParameter($reflectionParameter);
         $schema = SchemaUtils::create($type);
 
-        return (new Parameter())
+        return new Parameter()
             ->setName($parameterPathName)
             ->setIn(ParameterIn::PATH)
             ->setRequired(true)
@@ -52,7 +52,7 @@ class ParametersService
             foreach ($reflectionProperties as $reflectionProperty) {
                 $type = TypeUtils::getForProperty($reflectionProperty);
                 $schema = SchemaUtils::create($type);
-                $parameters[] = (new Parameter())
+                $parameters[] = new Parameter()
                     ->setName($reflectionProperty->getName())
                     ->setIn(ParameterIn::QUERY)
                     ->setSchema($schema);

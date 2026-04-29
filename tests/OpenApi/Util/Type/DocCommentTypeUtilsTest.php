@@ -5,6 +5,7 @@ namespace Ouzo\OpenApi\Util\Type;
 use Ouzo\Fixtures\SampleClass;
 use Ouzo\Fixtures\SampleController;
 use Ouzo\Fixtures\Tag;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -15,10 +16,8 @@ class DocCommentTypeUtilsTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function shouldGetNullWhenReturnIsArrayAndIsWithoutDocComment()
+    #[Test]
+    public function shouldGetNullWhenReturnIsArrayAndIsWithoutDocComment(): void
     {
         //given
         $reflectionClass = new ReflectionClass(SampleController::class);
@@ -34,10 +33,8 @@ class DocCommentTypeUtilsTest extends TestCase
         $this->assertFalse($forReturn->isArray());
     }
 
-    /**
-     * @test
-     */
-    public function shouldGetArrayOfScalarTypesForReturnWithDocComment()
+    #[Test]
+    public function shouldGetArrayOfScalarTypesForReturnWithDocComment(): void
     {
         //given
         $reflectionClass = new ReflectionClass(SampleController::class);
@@ -53,10 +50,8 @@ class DocCommentTypeUtilsTest extends TestCase
         $this->assertTrue($forReturn->isArray());
     }
 
-    /**
-     * @test
-     */
-    public function shouldGetArrayOfObjectTypesForReturnWithDocComment()
+    #[Test]
+    public function shouldGetArrayOfObjectTypesForReturnWithDocComment(): void
     {
         //given
         $reflectionClass = new ReflectionClass(SampleController::class);
@@ -72,10 +67,8 @@ class DocCommentTypeUtilsTest extends TestCase
         $this->assertTrue($forReturn->isArray());
     }
 
-    /**
-     * @test
-     */
-    public function shouldGetArrayOfObjectTypesForPropertyWithDocComment()
+    #[Test]
+    public function shouldGetArrayOfObjectTypesForPropertyWithDocComment(): void
     {
         //given
         $reflectionClass = new ReflectionClass(SampleClass::class);
@@ -91,10 +84,8 @@ class DocCommentTypeUtilsTest extends TestCase
         $this->assertTrue($forProperty->isArray());
     }
 
-    /**
-     * @test
-     */
-    public function shouldGetNullWhenDocsExistsButDoNotHaveSetTags()
+    #[Test]
+    public function shouldGetNullWhenDocsExistsButDoNotHaveSetTags(): void
     {
         //given
         $reflectionClass = new ReflectionClass(SampleClass::class);
