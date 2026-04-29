@@ -2,14 +2,13 @@
 
 namespace Ouzo\OpenApi\Service\OperationId;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class OperationIdRepositoryTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldGetLastOperationId()
+    #[Test]
+    public function shouldGetLastOperationId(): void
     {
         //given
         $operationIdRepository = new OperationIdRepository();
@@ -26,10 +25,8 @@ class OperationIdRepositoryTest extends TestCase
         $this->assertSame('operation_3', $operationId);
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnFalseIfOperationIdIsNotInRepository()
+    #[Test]
+    public function shouldReturnFalseIfOperationIdIsNotInRepository(): void
     {
         //given
         $operationIdRepository = new OperationIdRepository();
@@ -41,10 +38,8 @@ class OperationIdRepositoryTest extends TestCase
         $this->assertFalse($hasOperationId);
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnTrueIfOperationIdIsInRepository()
+    #[Test]
+    public function shouldReturnTrueIfOperationIdIsInRepository(): void
     {
         //given
         $operationIdRepository = new OperationIdRepository();

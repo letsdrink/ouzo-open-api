@@ -19,7 +19,7 @@ class ComponentsService
         }
 
         $all = $this->schemasRepository->all();
-        return (new Components())
+        return new Components()
             ->setSchemas($all);
     }
 }

@@ -22,7 +22,7 @@ class OpenApiService
 
     public function create(): OpenApi
     {
-        $openApi = (new OpenApi())
+        $openApi = new OpenApi()
             ->setOpenapi(OpenApiVersion::V_3_0_1);
 
         $paths = $this->pathsService->create();

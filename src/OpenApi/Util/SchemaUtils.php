@@ -37,7 +37,7 @@ class SchemaUtils
         if ($type->isArray()) {
             if (ScalarType::isScalar($typeName)) {
                 $schema = self::schemaForPrimitive($typeName, false);
-                $arraySchema = (new ArraySchema())
+                $arraySchema = new ArraySchema()
                     ->setItems($schema);
 
                 if ($isNullable) {
@@ -48,7 +48,7 @@ class SchemaUtils
             }
 
             $schema = self::schemaForClass($type);
-            $arraySchema = (new ArraySchema())
+            $arraySchema = new ArraySchema()
                 ->setItems($schema);
 
             if ($isNullable) {
@@ -61,7 +61,7 @@ class SchemaUtils
         $schema = self::schemaForClass($type);
 
         if ($isNullable) {
-            return (new ComposedSchema())
+            return new ComposedSchema()
                 ->setAllOf([$schema])
                 ->setNullable(true);
         }
@@ -77,14 +77,14 @@ class SchemaUtils
     private static function schemaForClass(Type $type): Schema
     {
         $reflectionClass = $type->getClass();
-        return (new Schema())
+        return new Schema()
             ->setRef(SchemaUtils::getPathForReflectionClass($reflectionClass));
     }
 
     private static function schemaForPrimitive(string $type, bool $nullable): Schema
     {
         $schemaType = TypeUtils::convertPhpTypeToOpenApiType($type);
-        $schema = (new Schema())
+        $schema = new Schema()
             ->setType($schemaType);
 
         if ($nullable) {

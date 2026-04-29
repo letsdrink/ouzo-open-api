@@ -6,14 +6,13 @@ use Ouzo\Fixtures\HiddenController;
 use Ouzo\Fixtures\SampleController;
 use Ouzo\Http\HttpMethod;
 use Ouzo\Routing\RouteRule;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class HiddenCheckerTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldCheckClassIsHidden()
+    #[Test]
+    public function shouldCheckClassIsHidden(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url', HiddenController::class, 'status', true);
@@ -27,10 +26,8 @@ class HiddenCheckerTest extends TestCase
         $this->assertTrue($hidden);
     }
 
-    /**
-     * @test
-     */
-    public function shouldCheckMethodIsHidden()
+    #[Test]
+    public function shouldCheckMethodIsHidden(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url', SampleController::class, 'hiddenMethod', true);
@@ -44,10 +41,8 @@ class HiddenCheckerTest extends TestCase
         $this->assertTrue($hidden);
     }
 
-    /**
-     * @test
-     */
-    public function shouldCheckClassAndMethodIsNotHidden()
+    #[Test]
+    public function shouldCheckClassAndMethodIsNotHidden(): void
     {
         //given
         $routeRule = new RouteRule(HttpMethod::GET, '/url', SampleController::class, 'scalarInReturn', true);

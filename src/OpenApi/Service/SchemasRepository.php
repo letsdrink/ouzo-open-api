@@ -18,7 +18,7 @@ use Ouzo\Utilities\Arrays;
 use ReflectionClass;
 use ReflectionEnum;
 use ReflectionEnumBackedCase;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 
 class SchemasRepository
 {
@@ -41,7 +41,7 @@ class SchemasRepository
 
         $includeParentProperties = is_null($pathForReflectionClass);
 
-        $schema = (new Schema())
+        $schema = new Schema()
             ->setType(CompoundType::OBJECT)
             ->setDiscriminator($discriminator);
 
@@ -78,12 +78,12 @@ class SchemasRepository
         }
 
         if (!$includeParentProperties) {
-            $allOf = [(new Schema())
+            $allOf = [new Schema()
                 ->setRef($pathForReflectionClass)];
             if (!empty($schema->getProperties())) {
                 $allOf[] = $schema;
             }
-            $schema = (new ComposedSchema())
+            $schema = new ComposedSchema()
                 ->setAllOf($allOf);
         }
 
@@ -95,7 +95,7 @@ class SchemasRepository
                     fn(ReflectionEnumBackedCase $case) => $case->getBackingValue()
                 );
                 $schemaType = TypeUtils::convertPhpTypeToOpenApiType($reflectionEnum->getBackingType()->getName());
-                $schema = (new EnumSchema())->setType($schemaType)->setEnum($values);
+                $schema = new EnumSchema()->setType($schemaType)->setEnum($values);
             }
         }
 
@@ -123,11 +123,11 @@ class SchemasRepository
         if (!is_null($discriminatorMapAttribute)) {
             $pathForReflectionClass = SchemaUtils::getPathForReflectionClass($reflectionClass);
 
-            $propertyName = $discriminatorMapAttribute->getTypeProperty();
+            $propertyName = $discriminatorMapAttribute->typeProperty;
             $required[] = $propertyName;
-            $discriminator = (new Discriminator())
+            $discriminator = new Discriminator()
                 ->setPropertyName($propertyName);
-            foreach ($discriminatorMapAttribute->getMapping() as $mappingName => $mappingClass) {
+            foreach ($discriminatorMapAttribute->mapping as $mappingName => $mappingClass) {
                 $mappingReflectionClass = new ReflectionClass($mappingClass);
                 $value = SchemaUtils::getPathForReflectionClass($mappingReflectionClass);
                 $discriminator->addMapping($mappingName, $value);
@@ -150,7 +150,7 @@ class SchemasRepository
             return null;
         }
 
-        $typeSchema = (new ComposedSchema());
+        $typeSchema = new ComposedSchema();
         foreach ($mappingClasses as $mappingClass) {
             $schema = SchemaUtils::create($mappingClass);
             $typeSchema->addOneOf($schema);
@@ -160,7 +160,7 @@ class SchemasRepository
         }
 
         if ($type->isArray()) {
-            return (new ArraySchema())
+            return new ArraySchema()
                 ->setItems($typeSchema);
         }
 

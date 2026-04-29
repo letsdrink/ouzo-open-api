@@ -59,14 +59,14 @@ class OperationService
 
         $content = $this->contentService->create($reflectionMethod);
 
-        return (new Operation())
+        return new Operation()
             ->setTags([$tag])
             ->setSummary($summary)
             ->setOperationId($operationId)
             ->setParameters($parameters)
             ->setRequestBody($requestBody)
-            ->setResponses((new ApiResponses())
-                ->addApiResponse($responseCode, (new ApiResponse())
+            ->setResponses(new ApiResponses()
+                ->addApiResponse($responseCode, new ApiResponse()
                     ->setDescription('success')
                     ->setContent($content)
                 )

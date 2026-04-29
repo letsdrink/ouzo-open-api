@@ -3,16 +3,16 @@
   "minimum-stability": "stable",
   "license": "MIT",
   "require": {
-    "php": ">=8.2",
-    "letsdrink/ouzo": "dev-master#5e92d86",
-    "symfony/serializer": "^5.4.24",
-    "phpdocumentor/reflection-docblock": "^5.3.0"
+    "php": ">=8.4",
+    "letsdrink/ouzo": "dev-master",
+    "symfony/serializer": "~7.4.8",
+    "phpdocumentor/reflection-docblock": "~6.0.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.2.2",
-    "symfony/property-access": "^5.4.22",
-    "symfony/property-info": "^5.4.24",
-    "symfony/yaml": "^5.4.23"
+    "phpunit/phpunit": "~13.1.7",
+    "symfony/property-access": "~7.4.8",
+    "symfony/property-info": "~7.4.8",
+    "symfony/yaml": "~7.4.8"
   },
   "autoload": {
     "psr-4": {
