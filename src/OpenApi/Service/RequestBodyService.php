@@ -7,6 +7,7 @@ use Ouzo\Injection\Annotation\Inject;
 use Ouzo\OpenApi\Model\Parameters\RequestBody;
 use Ouzo\OpenApi\Util\Type\TypeUtils;
 use ReflectionParameter;
+use RuntimeException;
 
 class RequestBodyService
 {
@@ -18,6 +19,9 @@ class RequestBodyService
     public function create(ReflectionParameter $reflectionParameter, string $httpMethod): ?RequestBody
     {
         $reflectionType = $reflectionParameter->getType();
+        if(is_null($reflectionType)) {
+            throw new RuntimeException("Parameter {$reflectionParameter->getName()} is not defined type.");
+        }
 
         $isObjectAndNotGetHttpMethod = !$reflectionType->isBuiltin() && $httpMethod !== HttpMethod::GET;
         if ($isObjectAndNotGetHttpMethod) {
