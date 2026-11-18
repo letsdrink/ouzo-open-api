@@ -3,6 +3,7 @@
 namespace Ouzo\Fixtures;
 
 use Ouzo\Fixtures\Polymorphism\Message;
+use Ouzo\Fixtures\Traits\ClassWithTraits;
 use Ouzo\OpenApi\Attributes\Schema;
 
 class SampleClass
@@ -48,6 +49,8 @@ class SampleClass
     private $arrayOfSbjectsWithTypeInPhpDoc;
     /** @var Tag[]|null */
     private $nullableArrayOfObjectsWithTypeInPhpDoc;
+    /** @var \Ouzo\Fixtures\Tag[] */
+    private array $arrayOfObjectsWithFullyQualifiedNameInPhpDoc;
 
     private $emptyType;
     private string|int $unionType;
@@ -66,6 +69,7 @@ class SampleClass
     private ?object $nullableBuiltinObjectWhenNullableIsFalse;
 
     private ChildClass $nestedObject;
+    private ClassWithTraits $objectWithPropertiesFromTraits;
 
     private Message $polymorphicObject;
     private ?Message $nullablePolymorphicObjects;

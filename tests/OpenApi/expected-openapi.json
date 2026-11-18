@@ -30,6 +30,24 @@
         },
         "type": "object"
       },
+      "ClassWithTraits": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/ChildClass"
+            },
+            "type": "array"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "CommentMessage": {
         "allOf": [
           {
@@ -109,6 +127,12 @@
             "type": "array"
           },
           "arrayOfObjects": {
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "type": "array"
+          },
+          "arrayOfObjectsWithFullyQualifiedNameInPhpDoc": {
             "items": {
               "$ref": "#/components/schemas/Tag"
             },
@@ -310,6 +334,9 @@
           },
           "object": {
             "$ref": "#/components/schemas/Tag"
+          },
+          "objectWithPropertiesFromTraits": {
+            "$ref": "#/components/schemas/ClassWithTraits"
           },
           "objectWithTypeInPhpDoc": {
             "$ref": "#/components/schemas/Tag"
