@@ -10,6 +10,7 @@ use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
 use phpDocumentor\Reflection\Types\Compound;
+use phpDocumentor\Reflection\Types\ContextFactory;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Mixed_;
 use phpDocumentor\Reflection\Types\Null_;
@@ -28,14 +29,14 @@ class DocCommentTypeUtils
     public static function getForReturn(ReflectionMethod $reflectionMethod, ?string $default = null): DocCommentType
     {
         $docComment = $reflectionMethod->getDocComment();
-        $reflectionClass = $reflectionMethod->getDeclaringClass();
+        $reflectionClass = self::getDeclaringClassOrTrait($reflectionMethod);
         return self::get($docComment, 'return', $reflectionClass, $default);
     }
 
     public static function getForProperty(ReflectionProperty $reflectionProperty, ?string $default = null): DocCommentType
     {
         $docComment = $reflectionProperty->getDocComment();
-        $reflectionClass = $reflectionProperty->getDeclaringClass();
+        $reflectionClass = self::getDeclaringClassOrTrait($reflectionProperty);
         return self::get($docComment, 'var', $reflectionClass, $default);
     }
 
@@ -44,19 +45,52 @@ class DocCommentTypeUtils
         $emptyDocCommentType = new DocCommentType($default, null, false, false);
 
         if ($docComment !== false) {
+            $context = new ContextFactory()->createFromReflector($reflectionClass);
             $docBlockFactory = DocBlockFactory::createInstance();
-            $docBlock = $docBlockFactory->create($docComment);
+            $docBlock = $docBlockFactory->create($docComment, $context);
             $vars = $docBlock->getTagsByName($lookForTag);
             /** @var Var_|null $var */
             $var = Arrays::getValue($vars, 0);
 
-            return self::findType($var, $reflectionClass) ?: $emptyDocCommentType;
+            return self::findType($var) ?: $emptyDocCommentType;
         }
 
         return $emptyDocCommentType;
     }
 
-    private static function findType(?TagWithType $tag, ReflectionClass $reflectionClass): ?DocCommentType
+    private static function getDeclaringClassOrTrait(ReflectionMethod|ReflectionProperty $reflector): ReflectionClass
+    {
+        $reflectionClass = $reflector->getDeclaringClass();
+        return self::findDeclaringTrait($reflectionClass, $reflector) ?? $reflectionClass;
+    }
+
+    private static function findDeclaringTrait(ReflectionClass $reflectionClass, ReflectionMethod|ReflectionProperty $reflector): ?ReflectionClass
+    {
+        foreach ($reflectionClass->getTraits() as $trait) {
+            $nestedTrait = self::findDeclaringTrait($trait, $reflector);
+            if (!is_null($nestedTrait)) {
+                return $nestedTrait;
+            }
+            if (self::isDeclaredIn($reflector, $trait)) {
+                return $trait;
+            }
+        }
+        return null;
+    }
+
+    private static function isDeclaredIn(ReflectionMethod|ReflectionProperty $reflector, ReflectionClass $trait): bool
+    {
+        if ($reflector instanceof ReflectionMethod) {
+            return $reflector->getFileName() === $trait->getFileName()
+                && $reflector->getStartLine() >= $trait->getStartLine()
+                && $reflector->getEndLine() <= $trait->getEndLine();
+        }
+
+        $name = $reflector->getName();
+        return $trait->hasProperty($name) && $trait->getProperty($name)->getDocComment() === $reflector->getDocComment();
+    }
+
+    private static function findType(?TagWithType $tag): ?DocCommentType
     {
         if (is_null($tag)) {
             return null;
@@ -97,24 +131,7 @@ class DocCommentTypeUtils
             return new DocCommentType($type->__toString(), null, $nullable, $array);
         }
 
-        $classShortName = $type->__toString();
-        return self::findFqdnClass($reflectionClass, $classShortName, $nullable, $array);
-    }
-
-    private static function findFqdnClass(ReflectionClass $reflectionClass, string $classShortName, bool $nullable, bool $array): DocCommentType
-    {
-        $fileName = $reflectionClass->getFileName();
-        $content = file_get_contents($fileName);
-
-        preg_match_all('/use (.*?);/', $content, $matches);
-        foreach ($matches[1] as $match) {
-            if (str_ends_with($match, $classShortName)) {
-                return new DocCommentType(CompoundType::OBJECT, $match, $nullable, $array);
-            }
-        }
-
-        $namespaceName = $reflectionClass->getNamespaceName();
-        $fqdn = "{$namespaceName}{$classShortName}";
-        return new DocCommentType(CompoundType::OBJECT, $fqdn, $nullable, $array);
+        $class = ltrim($type->__toString(), '\\');
+        return new DocCommentType(CompoundType::OBJECT, $class, $nullable, $array);
     }
 }
